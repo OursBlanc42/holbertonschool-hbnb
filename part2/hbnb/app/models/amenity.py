@@ -8,7 +8,7 @@ from app.models.base_model import BaseModel
 
 class Amenity(BaseModel):
 
-    def __init__(self, name, description=""):
+    def __init__(self, name):
         """
         Create instance of Amenity
 
@@ -18,4 +18,3 @@ class Amenity(BaseModel):
         """
         super().__init__()  # Call parent to generate UUID & timestamps
         self.name = name
-        self.description = description
