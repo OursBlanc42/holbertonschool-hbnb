@@ -29,11 +29,23 @@ class TestUserEndpoints(unittest.TestCase):
     def test_create_user_preexisting_email(self):
         """
         Test creating a new user with an email that already exists
+
+        Due to no persistance between test, we should create a user first
+        then try to create a second one with the same email
         """
+        # Create user
         response = self.client.post('/api/v1/users/', json={
-            "first_name": "Jane",
-            "last_name": "Doe",
-            "email": "jane.doe@example.com"
+            "first_name": "John First",
+            "last_name": "Doe First",
+            "email": "john.doe@example.com"
+        })
+        self.assertEqual(response.status_code, 201)
+
+        # Create second user with same email
+        response = self.client.post('/api/v1/users/', json={
+            "first_name": "John Second",
+            "last_name": "Doe Second",
+            "email": "john.doe@example.com"
         })
         self.assertEqual(response.status_code, 400)
 
@@ -46,14 +58,14 @@ class TestUserEndpoints(unittest.TestCase):
         """
         # Create user
         create_user = self.client.post('/api/v1/users/', json={
-            "first_name": "John",
+            "first_name": "Jean",
             "last_name": "Doe",
-            "email": "john.doe@example.com"
+            "email": "jean.doe@example.com"
         })
         self.assertEqual(create_user.status_code, 201)
 
-        # UUID extraction
-        user_id = create_user.json["id"]
+        # Get user ID from response
+        user_id = create_user.json['id']
 
         # Get user by ID
         response = self.client.get(f'/api/v1/users/{user_id}')
