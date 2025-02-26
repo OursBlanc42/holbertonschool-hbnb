@@ -1,6 +1,8 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
+from app.models.place import Place
+from app.models.review import Review
 
 
 class HBnBFacade:
@@ -160,3 +162,162 @@ class HBnBFacade:
         amenity.update(amenity_data)
         self.amenity_repo.update(amenity, amenity_data)
         return amenity
+
+# PLACE ENDPOINTS
+    def create_place(self, place_data):
+        """
+        create_place
+
+        Create a new place and add it to the place repository
+
+        Args:
+            place_data (dict): A dictionary containing place data
+
+        Returns:
+            Place: Place model representing the newly created place
+        """
+        place = Place(**place_data)
+        self.place_repo.add(place)
+        return place
+
+    def get_place(self, place_id):
+        """
+        get_place
+
+        Retrieve a place by its ID
+
+        Args:
+            place_id (UUID): The ID of the place to retrieve
+
+        Returns:
+            Place: The place object corresponding to the ID
+        """
+        if not place_id:
+            return None
+        else:
+            return self.place_repo.get(place_id)
+
+    def get_all_places(self):
+        """
+        get_all_places
+
+        Retrieves all places from the repository
+
+        Returns:
+            list: A list of all Place objects
+        """
+        places = self.place_repo.get_all()
+        return places
+
+    def update_place(self, place_id, place_data):
+        """
+        Update an existing place with new data if it exists
+
+        Args:
+            place_id (UUID): UUID of the place to update
+            place_data (dict): Dictionary of data to update
+
+        Returns:
+            place (Place): Instance of the updated place
+            None: If the place does not exist
+        """
+        place = self.place_repo.get(place_id)
+
+        if not place:
+            return None
+
+        place.update(place_data)
+        self.place_repo.update(place, place_data)
+        return place
+
+# REVIEW ENDPOINTS
+    def create_review(self, review_data):
+        """
+        create_review
+
+        Create a new review and add it to the review repository
+
+        Args:
+            review_data (dict): A dictionary containing review data
+
+        Returns:
+            Review: Review model representing the newly created review
+        """
+        review = Review(**review_data)
+        self.review_repo.add(review)
+        return review
+
+    def get_review(self, review_id):
+        """
+        get_review
+
+        Retrieve a review by its ID
+
+        Args:
+            review_id (UUID): The ID of the review to retrieve
+
+        Returns:
+            Review: The review object corresponding to the ID
+        """
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        """
+        get_all_reviews
+
+        Retrieves all reviews from the repository
+
+        Returns:
+            list: A list of all Review objects
+        """
+        reviews = self.review_repo.get_all()
+        return reviews
+
+    def get_reviews_by_place(self, place_id):
+        """
+        get_reviews_by_place
+
+        Retrieve all reviews for a specific place
+
+        Args:
+            place_id (UUID): The ID of the place to retrieve reviews for
+
+        Returns:
+            list: A list of all Review objects for the specified place
+        """
+        return self.review_repo.get_by_attribute('place_id', place_id)
+
+    def update_review(self, review_id, review_data):
+        """
+        Update an existing review with new data if it exists
+
+        Args:
+            review_id (UUID): UUID of the review to update
+            review_data (dict): Dictionary of data to update
+
+        Returns:
+            review (Review): Instance of the updated review
+            None: If the review does not exist
+        """
+        review = self.review_repo.get(review_id)
+
+        if not review:
+            return None
+
+        review.update(review_data)
+        self.review_repo.update(review, review_data)
+        return review
+
+    def delete_review(self, review_id):
+        """
+        delete_review
+
+        Delete a review by its ID
+
+        Args:
+            review_id (UUID): The ID of the review to delete
+
+        Returns:
+            bool: True if the review was deleted, False otherwise
+        """
+        return self.review_repo.delete(review_id)

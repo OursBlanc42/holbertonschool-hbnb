@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask import request
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -34,14 +35,18 @@ class PlaceList(Resource):
     @api.response(400, 'Invalid input data')
     def post(self):
         """Register a new place"""
-        # Placeholder for the logic to register a new place
-        pass
+        data = request.json
+        try:
+            place = facade.create_place(data)
+            return place, 201
+        except ValueError as e:
+            return {'message': str(e)}, 400
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
-        # Placeholder for logic to return a list of all places
-        pass
+        places = facade.get_all_places()
+        return places, 200
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -49,8 +54,10 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     def get(self, place_id):
         """Get place details by ID"""
-        # Placeholder for the logic to retrieve a place by ID, including associated owner and amenities
-        pass
+        place = facade.get_place_by_id(place_id)
+        if place:
+            return place, 200
+        return {'message': 'Place not found'}, 404
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -58,5 +65,11 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        # Placeholder for the logic to update a place by ID
-        pass
+        data = request.json
+        try:
+            place = facade.update_place(place_id, data)
+            if place:
+                return place, 200
+            return {'message': 'Place not found'}, 404
+        except ValueError as e:
+            return {'message': str(e)}, 400
