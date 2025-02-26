@@ -14,7 +14,6 @@ class Amenity(BaseModel):
 
         Args:
             name (string): Name of the amenity
-            description (str, optional): Amenity description. Defaults to "".
         """
         super().__init__()  # Call parent to generate UUID & timestamps
         self.name = name
