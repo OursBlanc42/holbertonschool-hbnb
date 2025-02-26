@@ -78,29 +78,23 @@ class HBnBFacade:
 
     def update_user(self, user_id, user_data):
         """
-        update_user
-
         Update an existing user with new data if it exists
-        (Validation handled in "put")
 
         Args:
             user_id (UUID): UUID
-            user_data (dict): Dictionnary of data
+            user_data (dict): Dictionary of data
 
         Returns:
             user (User): instance of the user
             None: if the user does not exist
         """
-
         user = self.user_repo.get(user_id)
 
         if not user:
             return None
 
-        if user:
-            for key, value in user_data.items():
-                setattr(user, key, value)
-            self.user_repo.update(user, user_data)
+        user.update(user_data)
+        self.user_repo.update(user, user_data)
         return user
 
 # AMENITY ENDPOINTS
@@ -148,10 +142,7 @@ class HBnBFacade:
 
     def update_amenity(self, amenity_id, amenity_data):
         """
-        update_amenity
-
         Update an existing amenity with new data if it exists
-        (Validation handled in "put")
 
         Args:
             amenity_id (UUID): UUID of the amenity to update
@@ -166,8 +157,6 @@ class HBnBFacade:
         if not amenity:
             return None
 
-        if amenity:
-            for key, value in amenity_data.items():
-                setattr(amenity, key, value)
-            self.amenity_repo.update(amenity, amenity_data)
+        amenity.update(amenity_data)
+        self.amenity_repo.update(amenity, amenity_data)
         return amenity
