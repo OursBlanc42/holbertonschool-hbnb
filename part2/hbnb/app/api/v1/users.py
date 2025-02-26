@@ -94,6 +94,7 @@ class UserResource(Resource):
             'last_name': user.last_name,
             'email': user.email}, 200
 
+    @api.expect(user_model, validate=True)
     @api.response(200, "User succeffuly updated")
     @api.response(404, "User not found")
     @api.response(400, "Invalid input data")
@@ -112,9 +113,6 @@ class UserResource(Resource):
                 (200 if successful, 400 or 404 if error)
         """
         user_data = api.payload
-
-        if not user_data or not isinstance(user_data, dict):
-            return {"error": "Invalid input data"}, 400
 
         user = facade.update_user(user_id, user_data)
         if not user:
