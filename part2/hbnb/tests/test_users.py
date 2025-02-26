@@ -29,23 +29,11 @@ class TestUserEndpoints(unittest.TestCase):
     def test_create_user_preexisting_email(self):
         """
         Test creating a new user with an email that already exists
-
-        Due to no persistance between test, we should create a user first
-        then try to create a second one with the same email
         """
-        # Create user
         response = self.client.post('/api/v1/users/', json={
-            "first_name": "John First",
-            "last_name": "Doe First",
-            "email": "john.doe@example.com"
-        })
-        self.assertEqual(response.status_code, 201)
-
-        # Create second user with same email
-        response = self.client.post('/api/v1/users/', json={
-            "first_name": "John Second",
-            "last_name": "Doe Second",
-            "email": "john.doe@example.com"
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "email": "jane.doe@example.com"
         })
         self.assertEqual(response.status_code, 400)
 
@@ -53,19 +41,19 @@ class TestUserEndpoints(unittest.TestCase):
         """
         Test getting a user by ID
 
-        Due to no persistance between test, we should create a user first
-        then get it by ID
+        Due to the creation of a random UUID for each user, we need to
+        create a user first, then retrieve it
         """
         # Create user
-        create_user = self.client.post('/api/v1/users/', json={
-            "first_name": "Jean",
+        response = self.client.post('/api/v1/users/', json={
+            "first_name": "John",
             "last_name": "Doe",
-            "email": "jean.doe@example.com"
+            "email": "john.doe@example.com"
         })
-        self.assertEqual(create_user.status_code, 201)
+        self.assertEqual(response.status_code, 201)
 
         # Get user ID from response
-        user_id = create_user.json['id']
+        user_id = response.json['id']
 
         # Get user by ID
         response = self.client.get(f'/api/v1/users/{user_id}')
@@ -81,47 +69,30 @@ class TestUserEndpoints(unittest.TestCase):
     def test_retrieve_user_list(self):
         """
         Test retrieving the list of users
-
-        Due to no persistance between test, we should create users first
-        then get the list
         """
-        # Create user 1
-        create_user = self.client.post('/api/v1/users/', json={
-            "first_name": "Jango",
-            "last_name": "Fett",
-            "email": "jango.fett@starwars.com"
-        })
-        self.assertEqual(create_user.status_code, 201)
-
-        # Create user 2
-        create_user = self.client.post('/api/v1/users/', json={
-            "first_name": "Boba",
-            "last_name": "Fett",
-            "email": "boba.fett@starwars.com"
-        })
-        self.assertEqual(create_user.status_code, 201)
-
-        # Get user list
         response = self.client.get('/api/v1/users/')
         self.assertEqual(response.status_code, 200)
+
+        # Print the userlist fort debug
+        print(f"Users in memory: {response.json}")
 
     def test_update_a_user(self):
         """
         Test updating a existing user
 
-        Due to no persistance between test, we should create user first
-        then update this user
+        Due to the creation of a random UUID for each user, we need to
+        create a user first, then retrieve it
         """
         # Create user
-        create_user = self.client.post('/api/v1/users/', json={
+        response = self.client.post('/api/v1/users/', json={
             "first_name": "Anakin",
             "last_name": "Skywalker",
             "email": "anakin.skywalker@starwars.com"
         })
-        self.assertEqual(create_user.status_code, 201)
+        self.assertEqual(response.status_code, 201)
 
         # UUID extraction
-        user_id = create_user.json["id"]
+        user_id = response.json["id"]
 
         # Get user by ID
         response = self.client.put(f'/api/v1/users/{user_id}', json={
@@ -147,8 +118,8 @@ class TestUserEndpoints(unittest.TestCase):
         """
         Test updating a existing user with invalid data
 
-        Due to no persistance between test, we should create user first
-        then update this user
+        Due to the creation of a random UUID for each user, we need to
+        create a user first, then retrieve it
         """
         # Create user
         create_user = self.client.post('/api/v1/users/', json={
