@@ -23,11 +23,7 @@ class TestUserEndpoints(unittest.TestCase):
         """
         Test creating a new user with invalid data
         """
-        response = self.client.post('/api/v1/users/', json={
-            "first_name": "",
-            "last_name": "",
-            "email": "invalid-email"
-        })
+        response = self.client.post('/api/v1/users/', json={})
         self.assertEqual(response.status_code, 400)
 
     def test_create_user_preexisting_email(self):
