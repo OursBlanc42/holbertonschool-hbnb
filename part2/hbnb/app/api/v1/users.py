@@ -21,7 +21,16 @@ class UserList(Resource):
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user"""
+        """
+        Register a new user.
+
+        Returns:
+        tuple: A tuple containing:
+            - dict: A dictionary with either the created user
+            details or an error message
+            - int: HTTP status code
+            (201 if successful, 400 if there is an error)
+        """
         user_data = api.payload
 
         # Simulate email uniqueness check
@@ -39,7 +48,14 @@ class UserList(Resource):
 
     @api.response(200, 'List of users retrieved successfully')
     def get(self):
-        """Get the list of all users"""
+        """
+        Get the list of all users
+
+        Returns:
+            tuple: A tuple containing:
+                - list: A list of dictionnaries, each containing user data
+                - int: HTTP status code 200 for success
+        """
         users = facade.get_all_users()
         return [
             {
@@ -57,7 +73,18 @@ class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID"""
+        """
+        Get user details by ID.
+
+        Args:
+            user_id (UUID): The ID of the user to retrieve details for
+
+        Returns:
+            tuple: A tuple containing:
+                - dict: A dictionary with either the user data
+                or an error message.
+                - int: HTTP status code (200 if successful, 404 if not found)
+        """
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -72,14 +99,17 @@ class UserResource(Resource):
     @api.response(400, "Invalid input data")
     def put(self, user_id):
         """
-        Update user from user_id
+        Update user details by ID.
 
         Args:
-            user_id (UUID): UUID
+            user_id (UUID): The ID of the user to be updated
 
         Returns:
-            user: user data updated
-            None : if invalid input data
+            tuple: A tuple containing:
+                - dict: A dictionary with either the updateduser data
+                or an error message.
+                - int: HTTP status code
+                (200 if successful, 400 or 404 if error)
         """
         user_data = api.payload
 

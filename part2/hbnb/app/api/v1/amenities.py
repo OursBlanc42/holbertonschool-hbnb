@@ -15,7 +15,16 @@ class AmenityList(Resource):
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new amenity"""
+        """
+        Add a new amenity
+
+        Returns:
+            tuple: A tuple containing:
+                - dict: A dictionary with either the created amenity
+                details or an error message
+                - int: HTTP status code
+                (201 if successful, 400 if there is an error)
+        """
         amenity_data = api.payload
 
         amenities = facade.get_all_amenities()
@@ -31,7 +40,14 @@ class AmenityList(Resource):
 
     @api.response(200, 'List of amenities retrieved successfully')
     def get(self):
-        """Retrieve a list of all amenities"""
+        """
+        Get the list of all amenities
+
+        Returns:
+            tuple: A tuple containing:
+                - list: A list of dictionnaries, each containing amenity data
+                - int: HTTP status code 200 for success
+        """
         amenities = facade.get_all_amenities()
 
         return [
@@ -48,7 +64,18 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity details retrieved successfully')
     @api.response(404, 'Amenity not found')
     def get(self, amenity_id):
-        """Get amenity details by ID"""
+        """
+        Get amenity details by ID.
+
+        Args:
+            amenity_id (UUID): The ID of the amenity to retrieve details for
+
+        Returns:
+            tuple: A tuple containing:
+                - dict: A dictionary with either the amenity data
+                or an error message.
+                - int: HTTP status code (200 if successful, 404 if not found)
+        """
         amenity = facade.get_amenity(amenity_id)
         if not amenity:
             return {'error': 'Amenity not found'}, 404
@@ -64,11 +91,17 @@ class AmenityResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, amenity_id):
         """
-        Update and amenity's information
+        Update amenity details by ID.
+
+        Args:
+            amenity_id (UUID): The ID of the amenity to be updated
 
         Returns:
-            amenity: amenity updated information
-            None: if invalid input data
+            tuple: A tuple containing:
+                - dict: A dictionary with either the updated amenity data
+                or an error message.
+                - int: HTTP status code
+                (200 if successful, 400 or 404 if error)
         """
         amenity_data = api.payload
         if not amenity_data or not isinstance(amenity_data, dict):
