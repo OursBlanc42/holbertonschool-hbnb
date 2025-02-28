@@ -100,7 +100,7 @@ Press CTRL+C to quit
  * Debugger PIN: 781-035-494
 ```
 
-8. Now, you can enjoy and try the API with CURL, Postman, Swagger web UI, or whatever... See examples below
+8. Now, you can enjoy and try the API with cURL, Postman, Swagger web UI, or whatever... See examples below
 
 
 ## Business Logic Layer Explanation
@@ -110,7 +110,11 @@ Press CTRL+C to quit
 The Business Logic Layer contains the core business logic and the models that represent the entities in the system. The main ones being Users; Amenities; Places; and Reviews.
 
 ### Entities and Their Responsibilities
+
+
+
 #### BaseModel class
+
 ##### Description
 
 As this project uses OOP concepts, the main classes (Users, Amenities, Place, and Reviews) will inherit from a parent class called `BaseModel`, which will assign a unique identifier (UUID) to each instance, and for auditing purposes, a creation date and an update date.
@@ -120,15 +124,11 @@ Each time an object (Users, Amenities, Review, Place) is created, a unique UUID 
 As this behaviour is the same for all objects, it has been implemented in this parent class so that each child 
 inherits these behaviours.
 
-##### Attributes
-None
-
-##### Relations
-None
-
 ##### Specific methods
 `save()` : Update the updated_at timestamp whenever the object is modified
 `update(data)` : Update the attributes of the object based on the provided dictionary
+
+
 
 #### - User class
 
@@ -136,100 +136,124 @@ None
 The user class inherit from BaseModel and manage the user informations.
 
 #### Attributes
-`id` (String): Unique identifier for each user.
-`first_name` (String): The first name of the user. Required, maximum length of 50 characters.
-`last_name` (String): The last name of the user. Required, maximum length of 50 characters.
-`email` (String): The email address of the user. Required, must be unique, and should follow standard email format validation.
-`is_admin` (Boolean): Indicates whether the user has administrative privileges. Defaults to False.
-`created_at` (DateTime): Timestamp when the user is created.
-`updated_at` (DateTime): Timestamp when the user is last updated.
+| Attribute    | Type      | Description                                              |
+|-------------|----------|----------------------------------------------------------|
+| `id`        | String   | Unique identifier for each user                          |
+| `first_name` | String   | The first name of the user (Required, max 50 chars)     |
+| `last_name`  | String   | The last name of the user (Required, max 50 chars)      |
+| `email`      | String   | Unique email address (Required, must follow email format) |
+| `is_admin`   | Boolean  | Indicates if user has admin privileges (Defaults to False) |
+| `created_at` | DateTime | Timestamp when the user is created                      |
+| `updated_at` | DateTime | Timestamp when the user is last updated                 |
 
 ##### Relations
 A **User** can own multiple **Place** instances (one-to-many relationship).
 A **User** can have multiple **Review** instances associated (one-to-many relationship).
 
-##### Specific methods
-None
 
 
 #### - Place class
+
 ##### Description
 The place class inherit from BaseModel and manage the place informations.
 
 ##### Attributes
-`id` (String): Unique identifier for each place.
-`title` (String): The title of the place. Required, maximum length of 100 characters.
-`description` (String): Detailed description of the place. Optional.
-`price` (Float): The price per night for the place. Must be a positive value.
-`latitude` (Float): Latitude coordinate for the place location. Must be within the range of -90.0 to 90.0.
-`longitude` (Float): Longitude coordinate for the place location. Must be within the range of -180.0 to 180.0.
-`owner` (User): User instance of who owns the place. This should be validated to ensure the owner exists.
-`created_at` (DateTime): Timestamp when the place is created.
-`updated_at` (DateTime): Timestamp when the place is last updated.
-
+| Attribute    | Type      | Description                                                    |
+|-------------|----------|----------------------------------------------------------------|
+| `id`        | String   | Unique identifier for each place                              |
+| `title`     | String   | The title of the place (Required, max 100 chars)              |
+| `description` | String  | Detailed description of the place (Optional)                 |
+| `price`     | Float    | Price per night (Must be a positive value)                    |
+| `latitude`  | Float    | Latitude coordinate (-90.0 to 90.0)                           |
+| `longitude` | Float    | Longitude coordinate (-180.0 to 180.0)                        |
+| `owner`     | User     | User instance who owns the place (Validated to ensure it exists) |
+| `created_at` | DateTime | Timestamp when the place is created                          |
+| `updated_at` | DateTime | Timestamp when the place is last updated                     |
 
 ##### Relations
 A **Place** can have multiple **Review** instances (one-to-many relationship).
 A **Place** can have multiple **Amenity** instances (many-to-many relationship).
-A **Place** can have one **Owner** (referencing to **User**) (one-to-one relationship).
-
-##### Specific methods
-None
-
-
-
-
-
+A **Place** can have one **Owner** (referencing to **User**) (many-to-one relationship).
 
 
 
 #### - Review class
+
 ##### Description
 The review class inherit from BaseModel and manage the review informations.
 
 ##### Attributes
-`id` (String): Unique identifier for each review.
-`text` (String): The content of the review. Required.
-`rating` (Integer): Rating given to the place, must be between 1 and 5.
-`place` (Place): Place instance being reviewed. Must be validated to ensure the place exists.
-`user` (User): User instance of who wrote the review. Must be validated to ensure the user exists.
-`created_at` (DateTime): Timestamp when the review is created.
-`updated_at` (DateTime): Timestamp when the review is last updated.
+| Attribute    | Type      | Description                                                   |
+|-------------|----------|---------------------------------------------------------------|
+| `id`        | String   | Unique identifier for each review                            |
+| `text`      | String   | The content of the review (Required)                         |
+| `rating`    | Integer  | Rating given to the place (Must be between 1 and 5)          |
+| `place`     | Place    | Place instance being reviewed (Validated to ensure it exists) |
+| `user`      | User     | User instance who wrote the review (Validated to ensure it exists) |
+| `created_at` | DateTime | Timestamp when the review is created                        |
+| `updated_at` | DateTime | Timestamp when the review is last updated                   |
 
 ##### Relations
-A **Review** can have one **User** instances (one-to-one relationship)
+A **Review** is linked to one **User** instances (many-to-one relationship)
 A **Review** can have one **Place** instances (one-to-one relationship)
-
-##### Specific methods
-None
-
 
 
 
 #### - Amenity class
+
 ##### Description
 The review class inherit from BaseModel and manage the amenities available.
 
 ##### Attributes
 
-`id` (String): Unique identifier for each amenity.
-`name` (String): The name of the amenity (e.g., "Wi-Fi", "Parking"). Required, maximum length of 50 characters.
-`created_at` (DateTime): Timestamp when the amenity is created.
-`updated_at` (DateTime): Timestamp when the amenity is last updated.
+| Attribute    | Type      | Description                                                   |
+|-------------|----------|---------------------------------------------------------------|
+| `id`        | String   | Unique identifier for each amenity                           |
+| `name`      | String   | The name of the amenity (e.g., "Wi-Fi", "Parking") (Required, max 50 chars) |
+| `created_at` | DateTime | Timestamp when the amenity is created                        |
+| `updated_at` | DateTime | Timestamp when the amenity is last updated                   |
 
 ##### Relations
 A **Amenity** can exist in multiple **Place** instances.
 
-
 ##### Specific methods
 None
-
 
 
 
 ### Core Classes and Methods
 #### - HBnBFacade (Main entry point)
 The Facade architecture centralizes communication between client and business layer.
+
+##### Methods
+
+| Method                            | Description                                   |
+|-----------------------------------|-----------------------------------------------|
+| **User Methods**                  |
+| `create_user(user_data)`          | Creates a new user with the provided data     |
+| `get_all_users()`                 | Retrieves all users                           |
+| `get_user(user_id)`               | Retrieves a user by their unique ID           |
+| `get_user_by_email(email)`        | Finds a user using their email address        |
+| `update_user(user_id, user_data)` | Updates an existing user by ID                | 
+| **Amenity Methods**               |
+| `create_amenity(amenity_data)`    | Creates a new amenity                         |
+| `get_amenity(amenity_id)`         | Retrieves an amenity by ID                    |
+| `get_all_amenities()`             | Retrieves all amenities                       |
+| `update_amenity(amenity_id, amenity_data)` | Updates an existing amenity by ID    |
+| **Place Methods**                 |
+| `create_place(place_data)`        | Creates a new place                           |
+| `get_place(place_id)`             | Retrieves a place by ID                       |
+| `get_all_places()`                | Retrieves all places                          |
+| `update_place(place_id, place_data)` | Updates an existing place by ID            |
+| **Review Methods**                |
+| `create_review(review_data)`      | Creates a new review for a place              |
+| `get_review(review_id)`           | Retrieves a review by ID                      |
+| `get_all_reviews()`               | Retrieves all reviews                         |
+| `get_reviews_by_place(place_id)`  | Retrieves all reviews for a specific place    |
+| `update_review(review_id, review_data)` | Updates an existing review by ID        |
+| `delete_review(review_id)`        | Deletes a review by ID                        |
+
+
 
 #### - Repository (Managing users)
 At this point of the project, we will manage data persistance with in-memory repository. This repository will later be replaced by a database-backed solution in Part 3.
@@ -241,12 +265,80 @@ We using the following repository to store associated data
 - ReviewRepository
 
 ### Usage Examples
-#### - Creating a User
-#### - Retrieving a User
-#### - Updating a User
-#### - Creating an Amenity
-#### - Listing All Amenities
+Find below some examples with cURL (you can also use software like Postman or use the web user interface SwaggerUI)
+The server is considered to be running
 
+#### - Creating a User
+##### Input
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/users/ \
+     -H "Content-Type: application/json" \
+     -d '{
+           "first_name": "John",
+           "last_name": "Doe",
+           "email": "john.doe@example.com"
+         }'
+```
+##### Output
+```bash
+{
+    "id": "3f6a434a-42af-4634-a7c6-b945a07f600c",
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com"
+}
+```
+
+#### - Creating an Amenity
+##### Input
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
+     -H "Content-Type: application/json" \
+     -d '{
+           "name": "Wi-Fi"
+         }'
+```
+##### Output
+```bash
+{
+    "id": "04f718f4-d1f9-4495-96b3-8622bf28d42b",
+    "name": "Wi-Fi"
+}
+```
+
+#### - Listing All Amenities
+In the same way as seen above, we've created other amenities to make the example more meaningful.
+
+##### Input
+```bash
+curl -X GET http://127.0.0.1:5000/api/v1/amenities/
+```
+
+##### Output
+```bash
+[
+    {
+        "id": "04f718f4-d1f9-4495-96b3-8622bf28d42b",
+        "name": "Wi-Fi"
+    },
+    {
+        "id": "321942bc-bc40-44f5-bd21-4d0d6b697ae6",
+        "name": "Ping-pong table"
+    },
+    {
+        "id": "1e04ac41-4a51-4508-860c-f158f4432ccd",
+        "name": "Sauna"
+    }
+]
+```
+
+#### - Create a place
+
+#### - Edit a place
+
+#### - Add a review
+
+#### - Delete a review
 
 
 
