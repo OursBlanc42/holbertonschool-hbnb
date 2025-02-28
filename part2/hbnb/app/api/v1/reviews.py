@@ -77,6 +77,10 @@ class ReviewList(Resource):
         else:
             return {"message": "The given place UUID does not exist"}, 400
 
+        # Check if 'text' field is not empty or just spaces
+        if not review_data.get("text") or review_data["text"].isspace():
+            return {"message": "Text of the review cannot be empty"}, 400
+
         # Create the review
         new_review = facade.create_review(review_data)
 
