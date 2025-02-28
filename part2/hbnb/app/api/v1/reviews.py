@@ -164,6 +164,10 @@ class ReviewResource(Resource):
         """
         review_data = api.payload
 
+        # Check if 'text' field is not empty or just spaces
+        if not review_data.get("text") or review_data["text"].isspace():
+            return {"message": "Text of the review cannot be empty"}, 400
+
         review = facade.update_review(review_id, review_data)
         if not review:
             return {"error": "Review not found"}, 404
