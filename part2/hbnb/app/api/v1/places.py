@@ -1,5 +1,4 @@
 from flask_restx import Namespace, Resource, fields
-from flask import request
 from app.services import facade
 
 api = Namespace('places', description='Place operations')
@@ -133,15 +132,17 @@ class PlaceResource(Resource):
         place_data = api.payload
 
         # Check if user UUID exist
-        owners = facade.get_all_users()
-        for owners_item in owners:
-            if owners_item.id == place_data['owner']:
-                break
-        else:
-            return {'message': 'The given owner UUID does not exist'}, 400
+        if "owner" in place_data:
+            owners = facade.get_all_users()
+            for owners_item in owners:
+                if owners_item.id == place_data['owner']:
+                    break
+            else:
+                return {'message': 'The given owner UUID does not exist'}, 400
 
         # Convert price to 2 digit :
-        place_data['price'] = round(place_data['price'], 2)
+        if "price" in place_data:
+            place_data['price'] = round(place_data['price'], 2)
 
         place = facade.update_place(place_id, place_data)
         if place:
