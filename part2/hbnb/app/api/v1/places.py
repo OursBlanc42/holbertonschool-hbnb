@@ -9,7 +9,7 @@ amenity_model = api.model('PlaceAmenity', {
     'name': fields.String(description='Name of the amenity')
 })
 
-user_model = api.model('PlaceUser', {
+owner_model = api.model('PlaceOwner', {
     'id': fields.String(description='User ID'),
     'first_name': fields.String(description='First name of the owner'),
     'last_name': fields.String(description='Last name of the owner'),
@@ -34,14 +34,12 @@ place_model = api.model('Place', {
         description='Latitude of the place',
         min=-90,
         max=90,
-        error_message='Latitude must be a number between -90 and 90',
         ),
     'longitude': fields.Float(
         required=True,
         description='Longitude of the place',
         min=-180,
         max=180,
-        error_message='Longitude must be a number between -180 and 180',
         ),
     'owner': fields.String(
         required=True,
@@ -84,7 +82,7 @@ class PlaceList(Resource):
             'latitude': place.latitude,
             'longitude': place.longitude,
             'owner': place.owner,
-            'amenities': place.amenities
+            'amenities': place.amenities,
         }, 201
 
 
@@ -118,9 +116,14 @@ class PlaceResource(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner': place.owner,
+                'owner': {
+                        'id': place.owner,
+                        'first_name': "PLACEholder",
+                        'last_name': "PLACEholder",
+                        'email': "PLACEholder",
+                    },
                 'amenities': place.amenities
-            }, 200
+                }, 200
         return {'message': 'Place not found'}, 404
 
     @api.expect(place_model)
