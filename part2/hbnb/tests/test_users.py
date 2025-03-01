@@ -59,7 +59,7 @@ class TestUserEndpoints(unittest.TestCase):
         response = self.client.get(f'/api/v1/users/{user_id}')
         self.assertEqual(response.status_code, 200)
 
-    def get_user_by_invalid_ID(self):
+    def test_get_user_by_invalid_ID(self):
         """
         Test getting a user by an invalid ID
         """
