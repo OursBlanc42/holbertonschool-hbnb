@@ -109,6 +109,25 @@ class PlaceResource(Resource):
         """Get place details by ID"""
         place = facade.get_place(place_id)
         if place:
+            # Fetch owner details using the owner ID
+            owner_id = place.owner
+            owner = None
+
+            # Find the owner in the list of users
+            users = facade.get_all_users()
+            for user in users:
+                if user.id == owner_id:
+                    owner = user
+                    break
+
+            # Prepare owner data
+            owner_data = {
+                'id': owner_id,
+                'first_name': owner.first_name if owner else "Owner first name",
+                'last_name': owner.last_name if owner else "owner last",
+                'email': owner.email if owner else "owner email"
+            }
+
             return {
                 'id': place.id,
                 'title': place.title,
@@ -116,12 +135,7 @@ class PlaceResource(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                'owner': {
-                        'id': place.owner,
-                        'first_name': "PLACEholder",
-                        'last_name': "PLACEholder",
-                        'email': "PLACEholder",
-                    },
+                'owner': owner_data,
                 'amenities': place.amenities
                 }, 200
         return {'message': 'Place not found'}, 404
