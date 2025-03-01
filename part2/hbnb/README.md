@@ -130,7 +130,7 @@ inherits these behaviours.
 
 
 
-#### - User class
+#### User class
 
 ##### Description
 The user class inherit from BaseModel and manage the user informations.
@@ -177,7 +177,7 @@ A **Place** can have one **Owner** (referencing to **User**) (many-to-one relati
 
 
 
-#### - Review class
+#### Review class
 
 ##### Description
 The review class inherit from BaseModel and manage the review informations.
@@ -199,7 +199,7 @@ A **Review** can have one **Place** instances (one-to-one relationship)
 
 
 
-#### - Amenity class
+#### Amenity class
 
 ##### Description
 The review class inherit from BaseModel and manage the amenities available.
@@ -216,13 +216,12 @@ The review class inherit from BaseModel and manage the amenities available.
 ##### Relations
 A **Amenity** can exist in multiple **Place** instances.
 
-##### Specific methods
-None
+
 
 
 
 ### Core Classes and Methods
-#### - HBnBFacade (Main entry point)
+#### HBnBFacade (Main entry point)
 The Facade architecture centralizes communication between client and business layer.
 
 ##### Methods
@@ -253,9 +252,7 @@ The Facade architecture centralizes communication between client and business la
 | `update_review(review_id, review_data)` | Updates an existing review by ID        |
 | `delete_review(review_id)`        | Deletes a review by ID                        |
 
-
-
-#### - Repository (Managing users)
+#### Repository (Managing users)
 At this point of the project, we will manage data persistance with in-memory repository. This repository will later be replaced by a database-backed solution in Part 3.
 
 We using the following repository to store associated data
@@ -263,6 +260,13 @@ We using the following repository to store associated data
 - AmenityRepository
 - PlaceRepository
 - ReviewRepository
+
+#### Further information
+As the instructions were rather prescriptive, we wanted to be prepared for any eventuality. 
+However, after discussions with SWE, it turned out that amenities would be added to places as next part of the project.
+That's why place creation and update don't handle amenity lists (which are always empty by default, as implemented in the basic Place class template).
+So it's not an oversight, but a deliberate choice to focus on what's expected from the instructions, rather than wasting time implementing things (and potentially causing more bugs) that aren't required.
+
 
 ### Usage Examples
 Find below some examples with cURL (you can also use software like Postman or use the web user interface SwaggerUI)
@@ -282,7 +286,7 @@ curl -X POST http://127.0.0.1:5000/api/v1/users/ \
 ##### Output
 ```bash
 {
-    "id": "3f6a434a-42af-4634-a7c6-b945a07f600c",
+    "id": "221dd59c-9515-48f9-9df9-53d6eed9daf6",
     "first_name": "John",
     "last_name": "Doe",
     "email": "john.doe@example.com"
@@ -301,7 +305,7 @@ curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
 ##### Output
 ```bash
 {
-    "id": "04f718f4-d1f9-4495-96b3-8622bf28d42b",
+    "id": "1bddfe61-858c-4890-bd78-13bf172fe3a8",
     "name": "Wi-Fi"
 }
 ```
@@ -318,21 +322,38 @@ curl -X GET http://127.0.0.1:5000/api/v1/amenities/
 ```bash
 [
     {
-        "id": "04f718f4-d1f9-4495-96b3-8622bf28d42b",
+        "id": "1bddfe61-858c-4890-bd78-13bf172fe3a8",
         "name": "Wi-Fi"
     },
     {
-        "id": "321942bc-bc40-44f5-bd21-4d0d6b697ae6",
+        "id": "152d876a-35c1-4321-a778-561ed4534826",
         "name": "Ping-pong table"
     },
     {
-        "id": "1e04ac41-4a51-4508-860c-f158f4432ccd",
+        "id": "1bddfe61-858c-4890-bd78-13bf172fe3a8",
         "name": "Sauna"
     }
 ]
 ```
 
 #### - Create a place
+As explained before, the amenities mangement will be implemented in next part of this project.
+
+##### Input
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "title": "Cozy Apartment",
+           "description": "A nice place to stay",
+           "price": 100.0,
+           "latitude": 37.7749,
+           "longitude": -122.4194,
+           "owner_id": "221dd59c-9515-48f9-9df9-53d6eed9daf6"
+         }'
+```
+
+##### Output
 
 #### - Edit a place
 
