@@ -86,7 +86,9 @@ class TestPlaceEndpoints(unittest.TestCase):
         Test updating a place that does not exist
         """
         response = self.client.put('/api/v1/places/non-existent-id', json={
-            "title": "Dagobah cave"
+            "title": "The New Dagobah cave",
+            "price": 4242.42,
+            "description": "A place to face your fears"
         })
         self.assertEqual(response.status_code, 404)
 
@@ -196,4 +198,3 @@ class TestPlaceEndpoints(unittest.TestCase):
             "description": "A place to face your fears"
         })
         self.assertEqual(response.status_code, 400)
-
