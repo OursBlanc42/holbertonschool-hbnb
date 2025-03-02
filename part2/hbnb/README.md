@@ -297,6 +297,7 @@ Please find below the list of all possibles operations :
 | GET    | `/api/v1/places/{place_id}`      | Get place details by ID       |
 | GET    | `/api/v1/places/{place_id}/reviews` | Get all reviews for a specific place |
 
+You can also find all these informations in the SwaggerUI interface at http://127.0.0.1:5000
 
 ### Usage Examples
 Find below some examples with cURL (you can also use software like Postman or use the web user interface SwaggerUI)
