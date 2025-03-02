@@ -1,5 +1,10 @@
 # HBNB Part 2 - BL and API
 
+## Version 1.0.0
+Release Date: 2 march 2025
+
+This is the `1.0.0` version of the project ! First release !
+
 ## Disclaimer
 For more information about this project, please refer to Part 1 README.md
 [Link to part1 README](../../part1/README.md)
@@ -269,10 +274,9 @@ However, after discussions with SWE, it turned out that amenities would be added
 That's why place creation and update don't handle amenity lists (which are always empty by default, as implemented in the basic Place class template).
 So it's not an oversight, but a deliberate choice to focus on what's expected from the instructions, rather than wasting time implementing things (and potentially causing more bugs) that aren't required.
 
-### API operations
+### HBnB API - Endpoints
 Please find below the list of all possibles operations :
 
-# HBnB API - Endpoints
 
 | Method | Endpoint                          | Description |
 |--------|-----------------------------------|-------------|
