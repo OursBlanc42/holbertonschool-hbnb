@@ -53,7 +53,7 @@ place_model = api.model('Place', {
         )
 })
 
-
+# Special model when updating a place
 place_update_model = api.model('PlaceUpdate', {
     'title': fields.String(
         required=True,
