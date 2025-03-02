@@ -8,7 +8,7 @@ from app.models.base_model import BaseModel
 
 class Review(BaseModel):
 
-    def __init__(self, text, rating, place, user):
+    def __init__(self, text, rating, place_id, user_id):
         """
         Create instance of review
 
@@ -21,5 +21,5 @@ class Review(BaseModel):
         super().__init__()  # Call parent to generate UUID & timestamps
         self.text = text
         self.rating = rating
-        self.place = place
-        self.user = user
+        self.place_id = place_id
+        self.user_id = user_id
