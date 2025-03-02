@@ -54,7 +54,7 @@ place_model = api.model('Place', {
 })
 
 
-place_update_model = api.model('Place', {
+place_update_model = api.model('PlaceUpdate', {
     'title': fields.String(
         required=True,
         description='Title of the place'),
@@ -65,7 +65,8 @@ place_update_model = api.model('Place', {
         required=True,
         description='Price per night',
         min=0,
-        ),
+        )
+})
 
 
 @api.route('/')
@@ -138,9 +139,11 @@ class PlaceResource(Resource):
             # Prepare owner data
             owner_data = {
                 'id': owner_id,
-                'first_name': owner.first_name if owner else "Owner first name",
-                'last_name': owner.last_name if owner else "owner last",
-                'email': owner.email if owner else "owner email"
+                'first_name': owner.first_name if owner else (
+                    "Owner first name"),
+                'last_name': owner.last_name if owner else (
+                    "Owner last name"),
+                'email': owner.email if owner else "Owner email"
             }
 
             return {
@@ -155,7 +158,7 @@ class PlaceResource(Resource):
                 }, 200
         return {'message': 'Place not found'}, 404
 
-    @api.expect(place_model)
+    @api.expect(place_update_model, validate=True)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
