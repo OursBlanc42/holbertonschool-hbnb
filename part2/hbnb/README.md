@@ -267,12 +267,42 @@ However, after discussions with SWE, it turned out that amenities would be added
 That's why place creation and update don't handle amenity lists (which are always empty by default, as implemented in the basic Place class template).
 So it's not an oversight, but a deliberate choice to focus on what's expected from the instructions, rather than wasting time implementing things (and potentially causing more bugs) that aren't required.
 
+### API operations
+Please find below the list of all possibles operations :
+
+# HBnB API - Endpoints
+
+| Method | Endpoint                          | Description |
+|--------|-----------------------------------|-------------|
+| **Users** |  | **User operations** |
+| POST   | `/api/v1/users/`                 | Register a new user           |
+| GET    | `/api/v1/users/`                 | Get the list of all users     |
+| PUT    | `/api/v1/users/{user_id}`        | Update user details by ID     |
+| GET    | `/api/v1/users/{user_id}`        | Get user details by ID        |
+| **Amenities** |  | **Amenity operations** |
+| POST   | `/api/v1/amenities/`             | Add a new amenity             |
+| GET    | `/api/v1/amenities/`             | Get the list of all amenities |
+| PUT    | `/api/v1/amenities/{amenity_id}` | Update amenity details by ID  |
+| GET    | `/api/v1/amenities/{amenity_id}` | Get amenity details by ID     |   
+| **Reviews** |  | **Review operations** |
+| POST   | `/api/v1/reviews/`               | Register a new review         |
+| GET    | `/api/v1/reviews/`               | Get the list of all reviews   |
+| DELETE | `/api/v1/reviews/{review_id}`    | Delete review by ID           |
+| PUT    | `/api/v1/reviews/{review_id}`    | Update review details by ID   |
+| GET    | `/api/v1/reviews/{review_id}`    | Get review details by ID      |
+| **Places** |  | **Place operations** |
+| POST   | `/api/v1/places/`                | Register a new place          |
+| GET    | `/api/v1/places/`                | Retrieve a list of all places |
+| PUT    | `/api/v1/places/{place_id}`      | Update a place's information  |
+| GET    | `/api/v1/places/{place_id}`      | Get place details by ID       |
+| GET    | `/api/v1/places/{place_id}/reviews` | Get all reviews for a specific place |
+
 
 ### Usage Examples
 Find below some examples with cURL (you can also use software like Postman or use the web user interface SwaggerUI)
 The server is considered to be running
 
-#### - Creating a User
+#### Creating a User
 ##### Input
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/users/ \
@@ -286,14 +316,14 @@ curl -X POST http://127.0.0.1:5000/api/v1/users/ \
 ##### Output
 ```bash
 {
-    "id": "221dd59c-9515-48f9-9df9-53d6eed9daf6",
+    "id": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe",
     "first_name": "John",
     "last_name": "Doe",
     "email": "john.doe@example.com"
 }
 ```
 
-#### - Creating an Amenity
+#### Creating an Amenity
 ##### Input
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
@@ -305,12 +335,12 @@ curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
 ##### Output
 ```bash
 {
-    "id": "1bddfe61-858c-4890-bd78-13bf172fe3a8",
+    "id": "2c504a6d-fbbc-47bf-a52f-08c6bcc58db5",
     "name": "Wi-Fi"
 }
 ```
 
-#### - Listing All Amenities
+#### Listing All Amenities
 In the same way as seen above, we've created other amenities to make the example more meaningful.
 
 ##### Input
@@ -336,7 +366,7 @@ curl -X GET http://127.0.0.1:5000/api/v1/amenities/
 ]
 ```
 
-#### - Create a place
+#### Create a place
 As explained before, the amenities mangement will be implemented in next part of this project.
 
 ##### Input
@@ -349,17 +379,114 @@ curl -X POST "http://127.0.0.1:5000/api/v1/places/" \
            "price": 100.0,
            "latitude": 37.7749,
            "longitude": -122.4194,
-           "owner_id": "221dd59c-9515-48f9-9df9-53d6eed9daf6"
+           "owner": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe"
          }'
 ```
 
 ##### Output
+```bash
+{
+    "id": "a1d2b6f6-4e70-4109-a692-48c09b3eb204",
+    "title": "Cozy Apartment",
+    "description": "A nice place to stay",
+    "price": 100.0,
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "owner": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe",
+    "amenities": []
+}
+```
 
-#### - Edit a place
+#### Edit a place
+The syntaxe is : curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>"
+With <place_id> is the UUID of an existing place (as shown in previous examples).
 
-#### - Add a review
+```bash
+curl -X PUT "http://127.0.0.1:5000/api/v1/places/a1d2b6f6-4e70-4109-a692-48c09b3eb204" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "title": "Luxury Condo",
+           "description": "An upscale place to stay",
+           "price": 200.0
+         }'
+```
 
-#### - Delete a review
+##### Output
+```bash
+{
+    "message": "Place updated successfully"
+}
+```
+
+
+#### Get a place by this ID
+At this point, we can check if a user has been successfully created, along with an associated place. By retrieving this place using its ID, we can verify that everything has worked correctly so far.
+
+As requested in the guidelines, we are not managing the list of Reviews yet.
+
+##### Input
+```bash
+curl -X GET "http://127.0.0.1:5000/api/v1/places/a1d2b6f6-4e70-4109-a692-48c09b3eb204"
+```
+
+##### Output
+```bash
+{
+    "id": "a1d2b6f6-4e70-4109-a692-48c09b3eb204",
+    "title": "Luxury Condo",
+    "description": "An upscale place to stay",
+    "price": 200.0,
+    "latitude": 37.7749,
+    "longitude": -122.4194,
+    "owner": {
+        "id": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john.doe@example.com"
+    },
+    "amenities": []
+}
+```
+
+#### Add a review
+##### Input
+Provide a valid UUID for a previously created place (as shown before) and a valid UUID for a previously created user (as shown before)."
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/reviews/" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "text": "Amazing place, loved the view!",
+           "rating": 4,
+           "place_id": "a1d2b6f6-4e70-4109-a692-48c09b3eb204", 
+           "user_id": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe"
+         }'
+```
+
+##### Output
+```bash
+{
+    "id": "3356e7ff-c10b-4027-a42d-e03c1f258428",
+    "text": "Amazing place, loved the view!",
+    "rating": 4,
+    "user_id": "bf45264a-48a2-4bcf-874c-a9a0d9a2dfbe",
+    "place_id": "a1d2b6f6-4e70-4109-a692-48c09b3eb204"
+}
+```
+
+#### Delete a review
+Provide a valid review UUID for a previously created review (as shown before)
+##### Input
+```bash
+curl -X DELETE "http://127.0.0.1:5000/api/v1/reviews/3356e7ff-c10b-4027-a42d-e03c1f258428"
+```
+
+##### Output
+```bash
+{
+    "message": "Review deleted successfully"
+}
+```
 
 
 
