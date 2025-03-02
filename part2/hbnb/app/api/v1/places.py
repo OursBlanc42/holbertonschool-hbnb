@@ -16,6 +16,7 @@ owner_model = api.model('PlaceOwner', {
     'email': fields.String(description='Email of the owner')
 })
 
+
 # Define the place model for input validation and documentation
 place_model = api.model('Place', {
     'title': fields.String(
@@ -52,6 +53,21 @@ place_model = api.model('Place', {
         )
 })
 
+# Special model when updating a place
+place_update_model = api.model('PlaceUpdate', {
+    'title': fields.String(
+        required=True,
+        description='Title of the place'),
+    'description': fields.String(
+        description='Description of the place',
+        ),
+    'price': fields.Float(
+        required=True,
+        description='Price per night',
+        min=0,
+        )
+})
+
 
 @api.route('/')
 class PlaceList(Resource):
@@ -85,7 +101,6 @@ class PlaceList(Resource):
             'amenities': place.amenities,
         }, 201
 
-
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
@@ -100,6 +115,7 @@ class PlaceList(Resource):
             'owner': place.owner,
             'amenities': place.amenities
         } for place in places], 200
+
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -123,9 +139,11 @@ class PlaceResource(Resource):
             # Prepare owner data
             owner_data = {
                 'id': owner_id,
-                'first_name': owner.first_name if owner else "Owner first name",
-                'last_name': owner.last_name if owner else "owner last",
-                'email': owner.email if owner else "owner email"
+                'first_name': owner.first_name if owner else (
+                    "Owner first name"),
+                'last_name': owner.last_name if owner else (
+                    "Owner last name"),
+                'email': owner.email if owner else "Owner email"
             }
 
             return {
@@ -140,13 +158,16 @@ class PlaceResource(Resource):
                 }, 200
         return {'message': 'Place not found'}, 404
 
-    @api.expect(place_model)
+    @api.expect(place_update_model, validate=True)
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+
+        if not place_data:
+            return {'message': 'No data provided'}, 400
 
         # Check if user UUID exist
         if "owner" in place_data:
