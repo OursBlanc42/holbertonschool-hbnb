@@ -2,7 +2,7 @@
 
 ## Disclaimer
 For more information about this project, please refer to Part 1 README.md
-[Link to part1 README](../part1/README.md)
+[Link to part1 README](../../part1/README.md)
 
 
 ## Intro
