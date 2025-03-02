@@ -2,6 +2,8 @@
 
 ## Disclaimer
 For more information about this project, please refer to Part 1 README.md
+[Link to part1 README](../part1/README.md)
+
 
 ## Intro
 After creating the project structure using the various diagrams in part 1, the aim of this part 2 is to :
