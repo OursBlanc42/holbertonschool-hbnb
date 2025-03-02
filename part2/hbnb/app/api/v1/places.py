@@ -16,6 +16,7 @@ user_model = api.model('PlaceUser', {
     'email': fields.String(description='Email of the owner')
 })
 
+
 # Define the place model for input validation and documentation
 place_model = api.model('Place', {
     'title': fields.String(
@@ -55,6 +56,20 @@ place_model = api.model('Place', {
 })
 
 
+place_update_model = api.model('Place', {
+    'title': fields.String(
+        required=True,
+        description='Title of the place'),
+    'description': fields.String(
+        description='Description of the place',
+        ),
+    'price': fields.Float(
+        required=True,
+        description='Price per night',
+        min=0,
+        ),
+
+
 @api.route('/')
 class PlaceList(Resource):
     @api.expect(place_model, validate=True)
@@ -87,7 +102,6 @@ class PlaceList(Resource):
             'amenities': place.amenities
         }, 201
 
-
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
@@ -102,6 +116,7 @@ class PlaceList(Resource):
             'owner': place.owner,
             'amenities': place.amenities
         } for place in places], 200
+
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -130,6 +145,9 @@ class PlaceResource(Resource):
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
+
+        if not place_data:
+            return {'message': 'No data provided'}, 400
 
         # Check if user UUID exist
         if "owner" in place_data:
