@@ -27,6 +27,7 @@ class HBnBFacade:
         create_user
 
         Create a new user and add it to the user repository
+        Hash the password before adding to repo
 
         Args:
             user_data (dict): A dictionary containing user data
@@ -34,6 +35,10 @@ class HBnBFacade:
         Returns:
             User: User model representing the newly created user
         """
+        password = user_data['password']
+        hashed_password = User(**user_data).hash_password(password)
+        user_data['password'] = hashed_password
+
         user = User(**user_data)
         self.user_repo.add(user)
         return user
