@@ -8,7 +8,7 @@ from app.models.base_model import BaseModel
 
 class User(BaseModel):
 
-    def __init__(self, first_name, last_name, email, is_admin=False):
+    def __init__(self, first_name, last_name, email, password, is_admin=False):
         """
         Create the instance of user
 
@@ -22,8 +22,22 @@ class User(BaseModel):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.password = password
         self.is_admin = is_admin
         self.places = []  # list to store places user owns
 
-        # Password for the moment is not implemented (following the HBNB tasks)
-        # self.password = None
+    def hash_password(self, password):
+        """
+        Hashes the password before storing it
+        Args: password
+        """
+        from app import bcrypt
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def verify_password(self, password):
+        """
+        Verifies if the provided password matches the hashed password
+        Args: password
+        """
+        from app import bcrypt
+        return bcrypt.check_password_hash(self.password, password)

@@ -19,6 +19,12 @@ user_model = api.model('User', {
         required=True,
         description="Email of the user",
         pattern=r'^[^@]+@[^@]+\.[^@]+$'
+    ),
+    'password': fields.String(
+        required=True,
+        description="User password",
+        min_length=8,
+        max_length=18,
     )
 })
 
@@ -51,10 +57,8 @@ class UserList(Resource):
         new_user = facade.create_user(user_data)
         return {
             'id': new_user.id,
-            'first_name': new_user.first_name,
-            'last_name': new_user.last_name,
-            'email': new_user.email
-            }, 201
+            'message': 'User created successfully'
+        }, 201
 
     @api.response(200, 'List of users retrieved successfully')
     def get(self):
