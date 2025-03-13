@@ -35,9 +35,6 @@ class HBnBFacade:
         Returns:
             User: User model representing the newly created user
         """
-        password = user_data['password']
-        hashed_password = User(**user_data).hash_password(password)
-        user_data['password'] = hashed_password
 
         user = User(**user_data)
         self.user_repo.add(user)
