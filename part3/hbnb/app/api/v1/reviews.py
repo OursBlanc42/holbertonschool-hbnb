@@ -64,7 +64,7 @@ class ReviewList(Resource):
 
         # Catch UUID from JWT
         current_user = get_jwt_identity()
-        review_data["user_id"] = current_user
+        review_data["user_id"] = current_user["id"]
 
         # Check if place UUID exist
         places = facade.get_all_places()
@@ -76,12 +76,12 @@ class ReviewList(Resource):
             return {"message": "The given place UUID does not exist"}, 400
 
         # Check if the user does not own the place
-        if this_place.owner == current_user:
+        if this_place.owner == current_user["id"]:
             return {"message": "You cannot review your own place"}, 400
 
         # Check if the user has already reviewed this place
         for review_item in this_place.reviews:
-            if review_item.user_id == current_user:
+            if review_item.user_id == current_user["id"]:
                 return {"message": "You have already reviewed this place"}, 400
 
         # Check if 'text' field is not empty or just spaces
@@ -155,6 +155,7 @@ class ReviewResource(Resource):
     @api.response(200, "Review updated successfully")
     @api.response(404, "Review not found")
     @api.response(400, "Invalid input data")
+    @jwt_required()
     def put(self, review_id):
         """
         Update review details by ID.
@@ -171,6 +172,18 @@ class ReviewResource(Resource):
         """
         review_data = api.payload
 
+        # Catch UUID from JWT
+        current_user = get_jwt_identity()
+
+        # Retrieve review from DB
+        review = facade.get_review(review_id)
+        if not review:
+            return {"error": "Review not found"}, 404
+
+        # Check if the current user is the owner of the review
+        if review.user_id != current_user["id"]:
+            return {"message": "Unauthorized action"}, 403
+
         # Check if 'text' field is not empty or just spaces
         if not review_data.get("text") or review_data["text"].isspace():
             return {"message": "Text of the review cannot be empty"}, 400
@@ -183,6 +196,7 @@ class ReviewResource(Resource):
 
     @api.response(200, "Review deleted successfully")
     @api.response(404, "Review not found")
+    @jwt_required()
     def delete(self, review_id):
         """
         Delete review by ID.
@@ -196,13 +210,19 @@ class ReviewResource(Resource):
                 - int: HTTP status code
                 (200 if successful, 404 if error)
         """
+        # Catch UUID from JWT
+        current_user = get_jwt_identity()
 
         # Check if review exist
         review = facade.get_review(review_id)
         if not review:
             return {"error": "Review not found"}, 404
 
-        # Delete the review from the associated place"s review list
+        # Check if the user is the author of the review
+        if review.user_id != current_user["id"]:
+            return {"message": "Unauthorized action"}, 403
+
+        # Delete the review from the associated place's review list
         this_place = facade.get_place(review.place_id)
         if this_place:
             for existing_review in this_place.reviews:

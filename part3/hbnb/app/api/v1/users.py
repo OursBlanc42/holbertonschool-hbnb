@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 api = Namespace('users', description='User operations')
 
@@ -25,6 +27,20 @@ user_model = api.model('User', {
         description="User password",
         min_length=8,
         max_length=18,
+    )
+})
+
+# Define the user model for input validation and documentation
+user_model_update = api.model('User for update', {
+    'first_name': fields.String(
+        required=True,
+        description="First name of the user",
+        max_length=50
+    ),
+    'last_name': fields.String(
+        required=True,
+        description="Last name of the user",
+        max_length=50
     )
 })
 
@@ -108,10 +124,11 @@ class UserResource(Resource):
             'last_name': user.last_name,
             'email': user.email}, 200
 
-    @api.expect(user_model, validate=True)
+    @api.expect(user_model_update, validate=True)
     @api.response(200, "User succeffuly updated")
     @api.response(404, "User not found")
     @api.response(400, "Invalid input data")
+    @jwt_required()
     def put(self, user_id):
         """
         Update user details by ID.
@@ -127,6 +144,17 @@ class UserResource(Resource):
                 (200 if successful, 400 or 404 if error)
         """
         user_data = api.payload
+
+        # Check the given data to avoid modify password and email
+        if 'password' in user_data or 'email' in user_data:
+            return {"error": "You cannot modify email or password."}, 403
+
+        # Catch UUID from JWT
+        current_user = get_jwt_identity()
+
+        # Check if the user is trying to update their own account
+        if current_user["id"] != user_id:
+            return {"error": "Unauthorized action"}, 403
 
         user = facade.update_user(user_id, user_data)
         if not user:
