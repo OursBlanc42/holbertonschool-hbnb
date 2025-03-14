@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 api = Namespace('places', description='Place operations')
 
@@ -42,10 +43,6 @@ place_model = api.model('Place', {
         min=-180,
         max=180,
         ),
-    'owner': fields.String(
-        required=True,
-        description='ID of the owner'
-        ),
     'amenities': fields.List(
         fields.String,
         required=False,
@@ -74,17 +71,14 @@ class PlaceList(Resource):
     @api.expect(place_model, validate=True)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new place"""
         place_data = api.payload
 
-        # Check if user UUID exist
-        owners = facade.get_all_users()
-        for owners_item in owners:
-            if owners_item.id == place_data['owner']:
-                break
-        else:
-            return {'message': 'The given owner UUID does not exist'}, 400
+        # Catch UUID from JWT and store in place_data['owner']
+        current_user = get_jwt_identity()
+        place_data['owner'] = current_user
 
         # Convert price to 2 digit :
         place_data['price'] = round(place_data['price'], 2)
@@ -162,6 +156,7 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
         place_data = api.payload
@@ -169,20 +164,18 @@ class PlaceResource(Resource):
         if not place_data:
             return {'message': 'No data provided'}, 400
 
-        # Check if user UUID exist
-        if "owner" in place_data:
-            owners = facade.get_all_users()
-            for owners_item in owners:
-                if owners_item.id == place_data['owner']:
-                    break
-            else:
-                return {'message': 'The given owner UUID does not exist'}, 400
+        # Catch user UUID from JWT token
+        current_user = get_jwt_identity()
+        place = facade.get_place(place_id)
+        if place.owner != current_user:
+            return {'error': 'Unauthorized action'}, 403
 
         # Convert price to 2 digit :
         if "price" in place_data:
             place_data['price'] = round(place_data['price'], 2)
 
         place = facade.update_place(place_id, place_data)
+
         if place:
             return {'message': 'Place updated successfully'}, 200
         return {'message': 'Place not found'}, 404

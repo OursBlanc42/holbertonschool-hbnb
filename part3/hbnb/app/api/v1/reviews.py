@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace("reviews", description="Review operations")
@@ -47,6 +48,7 @@ class ReviewList(Resource):
     @api.expect(review_model, validate=True)
     @api.response(201, "Review successfully created")
     @api.response(400, "Invalid input data")
+    @jwt_required()
     def post(self):
         """
         Register a new review
@@ -60,13 +62,9 @@ class ReviewList(Resource):
         """
         review_data = api.payload
 
-        # Check if user UUID exist
-        users = facade.get_all_users()
-        for users_item in users:
-            if users_item.id == review_data["user_id"]:
-                break
-        else:
-            return {"message": "The given user UUID does not exist"}, 400
+        # Catch UUID from JWT
+        current_user = get_jwt_identity()
+        review_data["user_id"] = current_user
 
         # Check if place UUID exist
         places = facade.get_all_places()
@@ -77,6 +75,15 @@ class ReviewList(Resource):
         else:
             return {"message": "The given place UUID does not exist"}, 400
 
+        # Check if the user does not own the place
+        if this_place.owner == current_user:
+            return {"message": "You cannot review your own place"}, 400
+
+        # Check if the user has already reviewed this place
+        for review_item in this_place.reviews:
+            if review_item.user_id == current_user:
+                return {"message": "You have already reviewed this place"}, 400
+
         # Check if 'text' field is not empty or just spaces
         if not review_data.get("text") or review_data["text"].isspace():
             return {"message": "Text of the review cannot be empty"}, 400
@@ -84,7 +91,7 @@ class ReviewList(Resource):
         # Create the review
         new_review = facade.create_review(review_data)
 
-        # Add review to the place"s review list
+        # Add review to the place's review list
         this_place.reviews.append(new_review)
 
         return {
