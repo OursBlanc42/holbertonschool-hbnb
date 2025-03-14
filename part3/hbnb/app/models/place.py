@@ -7,7 +7,13 @@ from app.models.base_model import BaseModel
 
 
 class Place(BaseModel):
-    def __init__(self, title, description, price, latitude, longitude, owner):
+    def __init__(self,
+                 title,
+                 description,
+                 price,
+                 latitude,
+                 longitude,
+                 owner=None):
         """
         Create instance of a place
 
@@ -17,7 +23,8 @@ class Place(BaseModel):
             price (float): Price of the place
             latitude (float): Latitude (geoloc) of the place
             longitude (float): Longitude (geoloc) of the place
-            owner (user): Owner of the place
+            owner (user, optional): Owner of the place
+                                    (is now optional, set via JWT)
             amenities (amenity): List of amenities available on this place
         """
         super().__init__()  # Call parent to generate UUID & timestamps

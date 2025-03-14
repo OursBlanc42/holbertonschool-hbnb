@@ -8,7 +8,7 @@ from app.models.base_model import BaseModel
 
 class Review(BaseModel):
 
-    def __init__(self, text, rating, place_id, user_id):
+    def __init__(self, text, rating, place_id, user_id=None):
         """
         Create instance of review
 
@@ -16,7 +16,8 @@ class Review(BaseModel):
             text (string): Comments in the review
             rating (int): 0 to 5 star rating
             place (Place): the place to which this review refers
-            user (User): tue user who writes the review
+            user (User, optional): the user who writes the review
+                                (now optionnal and catched from JWT)
         """
         super().__init__()  # Call parent to generate UUID & timestamps
         self.text = text
