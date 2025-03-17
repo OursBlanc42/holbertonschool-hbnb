@@ -51,9 +51,10 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """
-        Register a new user.
+        Register a new user (Only for admin users)
 
         Returns:
         tuple: A tuple containing:
@@ -62,6 +63,11 @@ class UserList(Resource):
             - int: HTTP status code
             (201 if successful, 400 if there is an error)
         """
+        # Catch info from JWT
+        current_user = get_jwt_identity()
+        if not current_user.get('is_admin'):
+            return {'error': 'Admin privileges required'}, 403
+
         user_data = api.payload
 
         # Simulate email uniqueness check
@@ -132,29 +138,45 @@ class UserResource(Resource):
     def put(self, user_id):
         """
         Update user details by ID.
+        If the user is an admin :
+            - they can update the email and password from any user.
+        If the user is not an admin :
+            - they can only update their own profils details.
+            - they cannot modify the email or password even if these fields
+                are specified in the input
+
+        Only the user themselves can update their own details.
 
         Args:
             user_id (UUID): The ID of the user to be updated
 
         Returns:
             tuple: A tuple containing:
-                - dict: A dictionary with either the updateduser data
-                or an error message.
+                - dict: A dictionary with either the updated
+                    user data or an error message.
                 - int: HTTP status code
-                (200 if successful, 400 or 404 if error)
+                    (200 if successful, 400 or 404 if there is an error).
         """
+        from app import bcrypt
+
+        # Catch UUID from JWT and data
+        current_user = get_jwt_identity()
         user_data = api.payload
 
-        # Check the given data to avoid modify password and email
-        if 'password' in user_data or 'email' in user_data:
-            return {"error": "You cannot modify email or password."}, 403
+        # Restriction if user is not an admin
+        if not current_user.get('is_admin'):
+            if 'password' in user_data or 'email' in user_data:
+                return {"error": "You cannot modify email or password."}, 403
 
-        # Catch UUID from JWT
-        current_user = get_jwt_identity()
+            if current_user["id"] != user_id:
+                return {"error": "Unauthorized action"}, 403
 
-        # Check if the user is trying to update their own account
-        if current_user["id"] != user_id:
-            return {"error": "Unauthorized action"}, 403
+        # Hash the new password
+        if "password" in user_data:
+            hashed_password = bcrypt.generate_password_hash(
+                user_data["password"]
+            ).decode('utf-8')
+            user_data["password"] = hashed_password
 
         user = facade.update_user(user_id, user_data)
         if not user:

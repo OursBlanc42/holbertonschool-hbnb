@@ -177,8 +177,13 @@ class PlaceResource(Resource):
 
         # Catch user UUID from JWT token
         current_user = get_jwt_identity()
+
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
         place = facade.get_place(place_id)
-        if place.owner != current_user["id"]:
+
+        if not is_admin and place.owner != current_user["id"]:
             return {'error': 'Unauthorized action'}, 403
 
         # Convert price to 2 digit :

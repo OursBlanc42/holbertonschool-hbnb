@@ -2,12 +2,104 @@
 	"info": {
 		"_postman_id": "e17577ad-f8d0-444a-86ec-cb49b93ad4bd",
 		"name": "HBNB",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"description": "This Postman collection contains a set of requests designed to test and validate the functionalities of the HBNB API.  \nIt covers various scenarios related to users, places, and reviews, ensuring proper access rights and administrative permissions.\n\nNote: The admin user is created automatically in the repository when the server starts, as a temporary solution until a real database is implemented.  \nThe tests are logically organized to simulate a **complete workflow**:",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "43105293"
 	},
 	"item": [
 		{
-			"name": "Create user John",
+			"name": "List all users 0 (catch admin)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.environment.set(\"admin_id\", jsonData[0].id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/users",
+				"description": "Retrieves the list of all users, which initially contains only the **admin user** created automatically when the server starts. We retrieve the UUID with this request"
+			},
+			"response": []
+		},
+		{
+			"name": "Loggin admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Catch token in JSON ",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Store token in variable",
+							"if (jsonResponse.access_token) {",
+							"    pm.environment.set(\"access_token_admin\", jsonResponse.access_token);",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/auth/login",
+				"description": "Request to be logged as an admin and retrieve the JWT"
+			},
+			"response": []
+		},
+		{
+			"name": "Create user John from Admin",
 			"event": [
 				{
 					"listen": "test",
@@ -27,6 +119,12 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -44,22 +142,8 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/users",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"users"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/users",
+				"description": "Create a user \"John\" from admin (using the JWT for authentification as an admin)"
 			},
 			"response": []
 		},
@@ -102,28 +186,13 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/auth/login",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"login"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/auth/login",
+				"description": "Logged as John to retrieve JWT"
 			},
 			"response": []
 		},
 		{
-			"name": "Create user Jane",
+			"name": "Create user Jane from John",
 			"event": [
 				{
 					"listen": "test",
@@ -142,6 +211,12 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -159,22 +234,55 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/users",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"users"
-					]
+				"url": "http://127.0.0.1:5000/api/v1/users",
+				"description": "With John JWT try to create a user. This operation should be an error cause only admin can create user"
+			},
+			"response": []
+		},
+		{
+			"name": "Create user Jane from Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Extract user id from json",
+							"var jsonData = pm.response.json();",
+							"var userId = jsonData.id;",
+							"",
+							"// Store user id",
+							"pm.environment.set(\"jane_user_id\", userId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"azerty123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/users"
 			},
 			"response": []
 		},
@@ -217,23 +325,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/auth/login",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"auth",
-						"login"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/auth/login"
 			},
 			"response": []
 		},
@@ -258,13 +350,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -283,22 +371,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/protected",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"protected"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/protected"
 			},
 			"response": []
 		},
@@ -322,13 +395,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_jane}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_jane}}"
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -347,27 +416,12 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/protected",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"protected"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/protected"
 			},
 			"response": []
 		},
 		{
-			"name": "List all users",
+			"name": "List all users 2",
 			"event": [
 				{
 					"listen": "test",
@@ -386,13 +440,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": ""
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -411,22 +461,52 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/users",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"users"
-					]
+				"url": "http://127.0.0.1:5000/api/v1/users"
+			},
+			"response": []
+		},
+		{
+			"name": "List all users 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": ""
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/users"
 			},
 			"response": []
 		},
@@ -452,13 +532,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -477,23 +553,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places/"
 			},
 			"response": []
 		},
@@ -519,13 +579,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_jane}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_jane}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -544,23 +600,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places/"
 			},
 			"response": []
 		},
@@ -581,13 +621,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -606,23 +642,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places/{{john_place_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places",
-						"{{john_place_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places/{{john_place_id}}"
 			},
 			"response": []
 		},
@@ -643,13 +663,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -668,23 +684,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places/{{jane_place_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places",
-						"{{jane_place_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places/{{jane_place_id}}"
 			},
 			"response": []
 		},
@@ -708,13 +708,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -733,22 +729,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places"
 			},
 			"response": []
 		},
@@ -771,13 +752,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -796,23 +773,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/"
 			},
 			"response": []
 		},
@@ -835,13 +796,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_jane}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_jane}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -860,23 +817,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/"
 			},
 			"response": []
 		},
@@ -897,13 +838,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -922,23 +859,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/{{john_review_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{john_review_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/{{john_review_id}}"
 			},
 			"response": []
 		},
@@ -962,13 +883,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -987,22 +904,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews"
 			},
 			"response": []
 		},
@@ -1023,13 +925,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1048,23 +946,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/"
 			},
 			"response": []
 		},
@@ -1085,13 +967,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -1110,23 +988,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						""
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/"
 			},
 			"response": []
 		},
@@ -1147,13 +1009,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -1172,23 +1030,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/{{jane_review_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{jane_review_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/{{jane_review_id}}"
 			},
 			"response": []
 		},
@@ -1216,13 +1058,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "DELETE",
 				"header": [
@@ -1241,23 +1079,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/{{jane_review_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{jane_review_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/{{jane_review_id}}"
 			},
 			"response": []
 		},
@@ -1278,13 +1100,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "DELETE",
 				"header": [
@@ -1303,23 +1121,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews/{{john_review_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews",
-						"{{john_review_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews/{{john_review_id}}"
 			},
 			"response": []
 		},
@@ -1343,13 +1145,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": ""
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -1368,22 +1166,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/reviews",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"reviews"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/reviews"
 			},
 			"response": []
 		},
@@ -1407,13 +1190,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": ""
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -1432,22 +1211,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places"
 			},
 			"response": []
 		},
@@ -1471,13 +1235,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": ""
+					}
 				},
 				"method": "GET",
 				"header": [
@@ -1496,28 +1256,12 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/places/{{john_place_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"places",
-						"{{john_place_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/places/{{john_place_id}}"
 			},
 			"response": []
 		},
 		{
-			"name": "Test update user John",
+			"name": "Update user John (invalid change)",
 			"event": [
 				{
 					"listen": "test",
@@ -1533,13 +1277,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -1558,28 +1298,12 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/users/{{john_user_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{john_user_id}}"
-					]
-				}
+				"url": "http://127.0.0.1:5000/api/v1/users/{{john_user_id}}"
 			},
 			"response": []
 		},
 		{
-			"name": "Test update user John 2 (invalid)",
+			"name": "Update user John 2 (valid change)",
 			"event": [
 				{
 					"listen": "test",
@@ -1595,13 +1319,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{access_token_john}}",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": "{{access_token_john}}"
+					}
 				},
 				"method": "PUT",
 				"header": [
@@ -1620,23 +1340,490 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://127.0.0.1:5000/api/v1/users/{{john_user_id}}",
-					"protocol": "http",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"v1",
-						"users",
-						"{{john_user_id}}"
-					]
+				"url": "http://127.0.0.1:5000/api/v1/users/{{john_user_id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Update user John from admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"first_name\": \"Jean\",\n  \"last_name\": \"Dusson\",\n  \"email\": \"jean.dusson@truc.fr\",\n  \"password\" : \"superpassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/users/{{john_user_id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "List all users 2 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": ""
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/users"
+			},
+			"response": []
+		},
+		{
+			"name": "Loggin updated user Jean",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"jean.dusson@truc.fr\",\n  \"password\" : \"superpassword\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Create amenity from non admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_jane}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Vacuum\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/"
+			},
+			"response": []
+		},
+		{
+			"name": "Create amenity from admin WiFi",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Wi-Fi\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/"
+			},
+			"response": []
+		},
+		{
+			"name": "Create amenity from admin Jukebox",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Catch token in JSON ",
+							"var jsonResponse = pm.response.json();",
+							"",
+							"// Store token in variable",
+							"if (jsonResponse.jukebox_id) {",
+							"    pm.environment.set(\"jukebox_id\", jsonResponse.jukebox_id);",
+							"}",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Jukebox\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/"
+			},
+			"response": []
+		},
+		{
+			"name": "Get list of all amenities",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the JSON response",
+							"const jsonData = pm.response.json();",
+							"",
+							"// Find the object with the name \"Jukebox\"",
+							"const jukebox = jsonData.find(item => item.name === \"Jukebox\");",
+							"",
+							"// Check if the \"Jukebox\" object is found",
+							"if (jukebox) {",
+							"    // Save the UUID of \"Jukebox\" to an environment variable",
+							"    pm.environment.set(\"jukeboxUUID\", jukebox.id);",
+							"    // Alternatively, you can save it to a collection variable:",
+							"    // pm.collectionVariables.set(\"jukeboxUUID\", jukebox.id);",
+							"} else {",
+							"    console.log(\"Jukebox not found in the response.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": ""
+					}
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/"
+			},
+			"response": []
+		},
+		{
+			"name": "Modify Jukebox amenity from admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Juke-box\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/{{jukeboxUUID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Modify Jukebox amenity from non admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_jane}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Music player\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/amenities/{{jukeboxUUID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Update a place as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"MODIFIED BY ADMIN !!\",\n  \"description\": \"MODIFIED BY ADMIN !!\",\n  \"price\": 200.0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/places/{{john_place_id}}"
+			},
+			"response": []
+		},
+		{
+			"name": "Deleting review as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{access_token_admin}}"
+					}
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:5000/api/v1/reviews/{{jane_review_id}}"
 			},
 			"response": []
 		}
