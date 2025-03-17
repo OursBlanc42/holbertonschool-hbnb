@@ -1803,7 +1803,7 @@
 				"auth": {
 					"type": "bearer",
 					"bearer": {
-						"token": "{{access_token_john}}"
+						"token": "{{access_token_admin}}"
 					}
 				},
 				"method": "DELETE",
