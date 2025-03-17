@@ -213,13 +213,16 @@ class ReviewResource(Resource):
         # Catch UUID from JWT
         current_user = get_jwt_identity()
 
+        # Set is_admin default to False if not exists
+        is_admin = current_user.get('is_admin', False)
+
         # Check if review exist
         review = facade.get_review(review_id)
         if not review:
             return {"error": "Review not found"}, 404
 
-        # Check if the user is the author of the review
-        if review.user_id != current_user["id"]:
+        # Check if the user is the author of the review or admin
+        if not is_admin and review.user_id != current_user["id"]:
             return {"message": "Unauthorized action"}, 403
 
         # Delete the review from the associated place's review list
