@@ -126,5 +126,75 @@ For a better explanation of the collection of tests carried out in postman, we h
 
 ## Database
 
-TO BE COMPLETED
+/!\  /!\  /!\  /!\  /!\ 
 
+/!\ TO BE COMPLETED /!\
+
+/!\  /!\  /!\  /!\  /!\ 
+
+
+
+
+### ER Diagram
+
+
+/!\  /!\  /!\  /!\  /!\ 
+
+/!\ TO BE CONFIRMED /!\
+
+/!\  /!\  /!\  /!\  /!\ 
+
+
+
+```mermaid
+
+erDiagram
+
+
+
+    USER {
+        string id PK
+        string first_name
+        string last_name
+        string e_mail
+        boolean is_admin
+        DateTime created_at
+        DateTime updated_at
+    }
+    
+    PLACE {
+        string id PK
+        string title
+        string description
+        float price
+        float latitude
+        float longitude
+        user owner
+        DateTime created_at
+        DateTime updated_at
+    }
+
+    REVIEW {
+        string id PK
+        string text
+        integer rating
+        place Place
+        user User
+        DateTime created_at
+        DateTime updated_at
+    }
+
+    AMENITY {
+        string id PK
+        string name
+        DateTime created_at
+        DateTime updated_at
+    }
+
+    USER ||--o{ REVIEW : "writes"
+    PLACE ||--o{ REVIEW : "receives"
+    USER ||--o{ PLACE : "owns"
+    PLACE ||--o{ PLACE_AMENITY : "has"
+    AMENITY ||--o{ PLACE_AMENITY : "belongs to"
+
+```
