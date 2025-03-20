@@ -78,9 +78,9 @@ Press CTRL+C to quit
 
 8. Now, you can enjoy and try the API with cURL, Postman, Swagger web UI, or whatever... See examples below
 
-### Testing
-For this part of the project, we made our test with a Postman collection. You can find the Postman file in the `hbnb/tests` directory.
 
+### Testing 
+For this part of the project, we made our test with a Postman collection. You can find the Postman file in the `hbnb/tests` directory.
 
 #### About testing
 
@@ -124,5 +124,7 @@ For a better explanation of the collection of tests carried out in postman, we h
 
 
 
-    
+## Database
+
+TO BE COMPLETED
 
