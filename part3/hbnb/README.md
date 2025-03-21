@@ -186,8 +186,6 @@ For a better explanation of the collection of tests carried out in postman, we h
 - **Purpose:**
     - Facilitates the Many-to-Many relationship between places and amenities.
 
-### ER Diagram
-
 #### Summary of Relationships
 - **Users:**
     - Own multiple Places (One-to-Many)
