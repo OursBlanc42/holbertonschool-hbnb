@@ -3,10 +3,21 @@
 Module for User
 """
 
-from app.models.base_model import BaseModel
+from app.extensions import db, bcrypt
+from sqlalchemy.orm import relationship
+from .base_model import BaseModel
 
 
 class User(BaseModel):
+    __tablename__ = 'users'
+
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    places = relationship('Place', backref='user', lazy=True, foreign_keys='Place.owner_id')  # Specify foreign key
+    reviews = relationship('Review', backref='author', lazy=True)  # One-to-Many with Review
 
     def __init__(self, first_name, last_name, email, password, is_admin=False):
         """
@@ -29,16 +40,12 @@ class User(BaseModel):
 
     def hash_password(self, password):
         """
-        Hashes the password before storing it
-        Args: password
+        Hash the password before storing it.
         """
-        from app import bcrypt
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """
-        Verifies if the provided password matches the hashed password
-        Args: password
+        Verify the hashed password.
         """
-        from app import bcrypt
         return bcrypt.check_password_hash(self.password, password)

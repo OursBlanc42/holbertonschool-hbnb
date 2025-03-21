@@ -3,36 +3,30 @@
 Module for place
 """
 
-from app.models.base_model import BaseModel
+from app.extensions import db
+from .base_model import BaseModel
+from sqlalchemy.orm import relationship
+from sqlalchemy import Table, Column, ForeignKey
 
+# Association table for Place and Amenity
+place_amenity = Table(
+    'place_amenity',
+    db.Model.metadata,
+    Column('place_id', db.String(36), ForeignKey('places.id'), primary_key=True),
+    Column('amenity_id', db.String(36), ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
-    def __init__(self,
-                 title,
-                 description,
-                 price,
-                 latitude,
-                 longitude,
-                 owner=None):
-        """
-        Create instance of a place
+    __tablename__ = 'places'
 
-        Args:
-            title (string): Title of the place
-            description (string): Description of the place
-            price (float): Price of the place
-            latitude (float): Latitude (geoloc) of the place
-            longitude (float): Longitude (geoloc) of the place
-            owner (user, optional): Owner of the place
-                                    (is now optional, set via JWT)
-            amenities (amenity): List of amenities available on this place
-        """
-        super().__init__()  # Call parent to generate UUID & timestamps
-        self.title = title
-        self.description = description
-        self.price = price
-        self.latitude = latitude
-        self.longitude = longitude
-        self.owner = owner
-        self.reviews = []  # List to store related reviews
-        self.amenities = []  # List to store related amenities
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    owner_id = db.Column(db.String(36), ForeignKey('users.id'), nullable=False)  # Foreign key to User
+    # Removed redundant user_id column
+    reviews = relationship('Review', backref='place', lazy=True)  # One-to-Many with Review
+    amenities = relationship('Amenity', secondary=place_amenity, lazy='subquery',  # Many-to-Many with Amenity
+                              backref=db.backref('associated_places', lazy=True, overlaps="associated_amenities"),
+                              overlaps="associated_amenities,places")  # Refined overlaps

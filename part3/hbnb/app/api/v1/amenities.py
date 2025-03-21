@@ -99,6 +99,7 @@ class AmenityResource(Resource):
     @api.response(200, "Amenity updated successfully")
     @api.response(404, "Amenity not found")
     @api.response(400, "Invalid input data")
+    @api.response(409, "Duplicate amenity name")
     @jwt_required()
     def put(self, amenity_id):
         """
@@ -123,7 +124,11 @@ class AmenityResource(Resource):
         if not amenity_data or not isinstance(amenity_data, dict):
             return {"error": "Invalid input data"}, 400
 
-        amenity = facade.update_amenity(amenity_id, amenity_data)
+        try:
+            amenity = facade.update_amenity(amenity_id, amenity_data)
+        except ValueError as e:
+            return {"message": str(e)}, 409  # Return conflict error for duplicate name
+
         if not amenity:
             return {"error": "Amenity not found"}, 404
         else:

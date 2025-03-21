@@ -1,4 +1,5 @@
-from app.persistence.repository import InMemoryRepository
+from app.persistence.repository import InMemoryRepository, SQLAlchemyRepository
+from app.persistence.user_repository import UserRepository
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
@@ -16,10 +17,10 @@ class HBnBFacade:
 
         Initialize repositories for user, place, review, and amenity
         """
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = UserRepository()
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
 # USER ENDPOINTS
     def create_user(self, user_data):
@@ -37,6 +38,7 @@ class HBnBFacade:
         """
 
         user = User(**user_data)
+        user.hash_password(user_data['password'])
         self.user_repo.add(user)
         return user
 
@@ -49,8 +51,7 @@ class HBnBFacade:
         Returns:
             list: A list of all User objects
         """
-        users = self.user_repo.get_all()
-        return users
+        return self.user_repo.get_all()
 
     def get_user(self, user_id):
         """
@@ -78,7 +79,7 @@ class HBnBFacade:
         Returns:
             User: The user object corresponding to the mail
         """
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def update_user(self, user_id, user_data):
         """
@@ -161,9 +162,14 @@ class HBnBFacade:
         if not amenity:
             return None
 
-        amenity.update(amenity_data)
-        self.amenity_repo.update(amenity, amenity_data)
-        return amenity
+        # Check for duplicate name
+        if 'name' in amenity_data:
+            existing_amenity = self.amenity_repo.get_by_attribute('name', amenity_data['name'])
+            if existing_amenity and existing_amenity[0].id != amenity_id:
+                raise ValueError("An amenity with this name already exists.")
+
+        self.amenity_repo.update(amenity_id, amenity_data)  # Pass amenity_id
+        return self.amenity_repo.get(amenity_id)  # Return updated amenity
 
 # PLACE ENDPOINTS
     def create_place(self, place_data):
@@ -228,9 +234,8 @@ class HBnBFacade:
         if not place:
             return None
 
-        place.update(place_data)
-        self.place_repo.update(place, place_data)
-        return place
+        self.place_repo.update(place_id, place_data)  # Pass place_id
+        return self.place_repo.get(place_id)  # Return updated place
 
 # REVIEW ENDPOINTS
     def create_review(self, review_data):
@@ -306,9 +311,8 @@ class HBnBFacade:
         if not review:
             return None
 
-        review.update(review_data)
-        self.review_repo.update(review, review_data)
-        return review
+        self.review_repo.update(review_id, review_data)  # Pass review_id
+        return self.review_repo.get(review_id)  # Return updated review
 
     def delete_review(self, review_id):
         """

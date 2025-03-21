@@ -52,13 +52,6 @@ class ReviewList(Resource):
     def post(self):
         """
         Register a new review
-
-        Returns:
-        tuple: A tuple containing:
-            - dict: A dictionary with either the created review
-            details or an error message
-            - int: HTTP status code
-            (201 if successful, 400 if there is an error)
         """
         review_data = api.payload
 
@@ -66,23 +59,10 @@ class ReviewList(Resource):
         current_user = get_jwt_identity()
         review_data["user_id"] = current_user["id"]
 
-        # Check if place UUID exist
-        places = facade.get_all_places()
-        for places_item in places:
-            if places_item.id == review_data["place_id"]:
-                this_place = places_item
-                break
-        else:
+        # Check if place UUID exists
+        this_place = facade.get_place(review_data["place_id"])
+        if not this_place:
             return {"message": "The given place UUID does not exist"}, 400
-
-        # Check if the user does not own the place
-        if this_place.owner == current_user["id"]:
-            return {"message": "You cannot review your own place"}, 400
-
-        # Check if the user has already reviewed this place
-        for review_item in this_place.reviews:
-            if review_item.user_id == current_user["id"]:
-                return {"message": "You have already reviewed this place"}, 400
 
         # Check if 'text' field is not empty or just spaces
         if not review_data.get("text") or review_data["text"].isspace():
@@ -91,16 +71,13 @@ class ReviewList(Resource):
         # Create the review
         new_review = facade.create_review(review_data)
 
-        # Add review to the place's review list
-        this_place.reviews.append(new_review)
-
         return {
             "id": new_review.id,
             "text": new_review.text,
             "rating": new_review.rating,
             "user_id": new_review.user_id,
             "place_id": new_review.place_id
-            }, 201
+        }, 201
 
     @api.response(200, "List of reviews retrieved successfully")
     def get(self):
@@ -224,14 +201,6 @@ class ReviewResource(Resource):
         # Check if the user is the author of the review or admin
         if not is_admin and review.user_id != current_user["id"]:
             return {"message": "Unauthorized action"}, 403
-
-        # Delete the review from the associated place's review list
-        this_place = facade.get_place(review.place_id)
-        if this_place:
-            for existing_review in this_place.reviews:
-                if existing_review.id == review_id:
-                    this_place.reviews.remove(existing_review)
-                    break
 
         # Delete the review object
         facade.delete_review(review_id)

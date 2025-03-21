@@ -76,14 +76,19 @@ class PlaceList(Resource):
         """Register a new place"""
         place_data = api.payload
 
-        # Catch UUID from JWT and store in place_data['owner']
+        # Catch UUID from JWT and store in place_data['owner_id']
         current_user = get_jwt_identity()
-        place_data['owner'] = current_user["id"]
+        place_data['owner_id'] = current_user["id"]  # Use 'owner_id'
 
-        # Convert price to 2 digit :
+        # Convert price to 2 digit:
         place_data['price'] = round(place_data['price'], 2)
 
+        # Create the place
         place = facade.create_place(place_data)
+
+        # Retrieve owner details
+        owner = facade.get_user(place.owner_id)
+
         return {
             'id': place.id,
             'title': place.title,
@@ -91,8 +96,12 @@ class PlaceList(Resource):
             'price': place.price,
             'latitude': place.latitude,
             'longitude': place.longitude,
-            'owner': place.owner,
-            'amenities': place.amenities,
+            'owner': {
+                'id': owner.id,
+                'first_name': owner.first_name,
+                'last_name': owner.last_name,
+                'email': owner.email
+            },
         }, 201
 
     @api.response(200, 'List of places retrieved successfully')
@@ -132,19 +141,12 @@ class PlaceResource(Resource):
 
         place = facade.get_place(place_id)
         if place:
-            # Fetch owner details using the owner ID
-            owner_id = place.owner
-
-            # Find the owner in the list of users
-            users = facade.get_all_users()
-            for user in users:
-                if user.id == owner_id:
-                    owner = user
-                    break
+            # Fetch owner details using the owner_id
+            owner = facade.get_user(place.owner_id)  # Use 'owner_id'
 
             # Prepare owner data
             owner_data = {
-                'id': owner_id,
+                'id': owner.id,
                 'first_name': owner.first_name,
                 'last_name': owner.last_name,
                 'email': owner.email
@@ -157,9 +159,9 @@ class PlaceResource(Resource):
                 'price': place.price,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
-                # 'owner': owner_data,
+                'owner': owner_data,  # Include owner details
                 # 'amenities': place.amenities
-                }, 200
+            }, 200
 
         return {'message': 'Place not found'}, 404
 
@@ -183,7 +185,7 @@ class PlaceResource(Resource):
 
         place = facade.get_place(place_id)
 
-        if not is_admin and place.owner != current_user["id"]:
+        if not is_admin and place.owner_id != current_user["id"]:  # Use 'owner_id'
             return {'error': 'Unauthorized action'}, 403
 
         # Convert price to 2 digit :
