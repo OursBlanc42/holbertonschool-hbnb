@@ -126,25 +126,82 @@ For a better explanation of the collection of tests carried out in postman, we h
 
 ## Database
 
-/!\  /!\  /!\  /!\  /!\ 
+### Tables and Relationships
 
-/!\ TO BE COMPLETED /!\
+#### Users Table (users)
+- **Attributes:**
+    - `id` (String, Primary Key, UUID)
+    - `first_name` (String, Required)
+    - `last_name` (String, Required)
+    - `email` (String, Unique, Required)
+    - `password` (String, Required)
+    - `is_admin` (Boolean, Default: False)
+    - `created_at` (DateTime, Auto-generated)
+    - `updated_at` (DateTime, Auto-updated)
+- **Relationships:**
+    - One-to-Many with places (Owner of places)
+    - One-to-Many with reviews (Author of reviews)
 
-/!\  /!\  /!\  /!\  /!\ 
+#### Places Table (places)
+- **Attributes:**
+    - `id` (String, Primary Key, UUID)
+    - `title` (String, Required)
+    - `description` (Text, Optional)
+    - `price` (Float, Required)
+    - `latitude` (Float, Required)
+    - `longitude` (Float, Required)
+    - `owner_id` (String, Foreign Key to users.id, Required)
+    - `created_at` (DateTime, Auto-generated)
+    - `updated_at` (DateTime, Auto-updated)
+- **Relationships:**
+    - One-to-Many with reviews (Place being reviewed)
+    - Many-to-Many with amenities (Amenities associated with the place)
 
+#### Reviews Table (reviews)
+- **Attributes:**
+    - `id` (String, Primary Key, UUID)
+    - `text` (Text, Required)
+    - `rating` (Integer, Required, Range: 1-5)
+    - `user_id` (String, Foreign Key to users.id, Required)
+    - `place_id` (String, Foreign Key to places.id, Required)
+    - `created_at` (DateTime, Auto-generated)
+    - `updated_at` (DateTime, Auto-updated)
+- **Relationships:**
+    - Many-to-One with users (Author of the review)
+    - Many-to-One with places (Place being reviewed)
 
+#### Amenities Table (amenities)
+- **Attributes:**
+    - `id` (String, Primary Key, UUID)
+    - `name` (String, Required, Unique)
+    - `created_at` (DateTime, Auto-generated)
+    - `updated_at` (DateTime, Auto-updated)
+- **Relationships:**
+    - Many-to-Many with places (Places associated with the amenity)
 
+#### Association Table (place_amenity)
+- **Attributes:**
+    - `place_id` (String, Foreign Key to places.id, Primary Key)
+    - `amenity_id` (String, Foreign Key to amenities.id, Primary Key)
+- **Purpose:**
+    - Facilitates the Many-to-Many relationship between places and amenities.
 
 ### ER Diagram
 
+#### Summary of Relationships
+- **Users:**
+    - Own multiple Places (One-to-Many)
+    - Write multiple Reviews (One-to-Many)
+- **Places:**
+    - Have multiple Reviews (One-to-Many)
+    - Have multiple Amenities (Many-to-Many)
+- **Reviews:**
+    - Belong to one User (Many-to-One)
+    - Belong to one Place (Many-to-One)
+- **Amenities:**
+    - Are associated with multiple Places (Many-to-Many)
 
-/!\  /!\  /!\  /!\  /!\ 
-
-/!\ TO BE CONFIRMED /!\
-
-/!\  /!\  /!\  /!\  /!\ 
-
-
+### ER Diagram
 
 ```mermaid
 
