@@ -6,12 +6,8 @@ from app.api.v1.reviews import api as reviews_ns, places_reviews_ns
 from app.api.v1.places import api as places_ns
 from app.api.v1.auth import api as login_ns
 from app.api.v1.protected import api as protected_ns
-from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
-
-
-# instanciate the bcrypt object
-bcrypt = Bcrypt()
+from app.extensions import db, bcrypt
 
 # instanciate the jwt object
 jwt = JWTManager()
@@ -38,5 +34,8 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     # initialize jwt
     jwt.init_app(app)
+
+    # initialize db
+    db.init_app(app)
 
     return app

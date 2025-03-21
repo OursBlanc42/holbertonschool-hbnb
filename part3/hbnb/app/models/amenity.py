@@ -3,17 +3,15 @@
 Module for amenity
 """
 
-from app.models.base_model import BaseModel
+from app.extensions import db
+from .base_model import BaseModel
+from sqlalchemy.orm import relationship
 
 
 class Amenity(BaseModel):
+    __tablename__ = 'amenities'
 
-    def __init__(self, name):
-        """
-        Create instance of Amenity
-
-        Args:
-            name (string): Name of the amenity
-        """
-        super().__init__()  # Call parent to generate UUID & timestamps
-        self.name = name
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    places = relationship('Place', secondary='place_amenity', lazy='subquery',  # Many-to-Many with Place
+                           backref=db.backref('associated_amenities', lazy=True, overlaps="associated_places"),
+                           overlaps="associated_places,amenities")  # Refined overlaps
