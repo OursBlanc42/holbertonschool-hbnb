@@ -1,0 +1,50 @@
+/* 
+  This is a SAMPLE File to get you started. Follow the instructions on the project to complete the tasks. 
+  You'll probably need to override some of theese styles.
+*/
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #E0E0E0;
+    color: #fff;
+    padding: 1rem;
+}
+
+nav a {
+    color: #333;
+    text-decoration: none;
+    margin-left: 1rem;
+}
+
+main {
+    padding: 2rem;
+}
+
+
+
+/* Cards about places */
+.place-card {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+/* Cards about reviews */
+.review-card {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Places</title>
+    <link rel="icon" type="image/png" href="images/favicon.jpg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <a href="index.html">
+            <img src="images/logo.png" alt="Hbnb logo" class="logo">
+        </a>
+        <nav>
+            <a href="index.html" id="home-link" class="home-button">Home</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
+            <a href="place.html" id="place-link" class="place-button">Places</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="filter">
+            <h3>Filter</h3>
+            <label for="price-filter">Max Price:</label>
+            <select id="price-filter">
+                <!-- Options will be populated dynamically -->
+            </select>
+        </section>
+        <section id="places-list">
+            <h2>Available Places</h2>
+            <!-- List of places will be populated dynamically -->
+            <ul>
+                <li>
+                    <article class="place-card">
+                        <h3>Name of place 1</h3>
+                        <p>Price per night : xxx €</p>
+                        <div class="details-button">
+                            <p>View Details</p>
+                        </div>
+                    </article>
+                </li>
+                <li>
+                    <article class="place-card">
+                        <h3>Name of place 2</h3>
+                        <p>Price per night : xxx €</p>
+                        <div class="details-button">
+                            <p>View Details</p>
+                        </div>
+                    </article>
+                </li>
+                <li>
+                    <article class="place-card">
+                        <h3>Name of place 3</h3>
+                        <p>Price per night : xxx €</p>
+                        <div class="details-button">
+                            <p>View Details</p>
+                        </div>
+                    </article>
+                </li>
+            </ul>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 Hbnb Evolution, all rights reserved. Made with ♥ by OursBlanc (student at Holberton School)</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
