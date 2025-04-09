@@ -227,6 +227,7 @@ function checkAuthentication() {
   }
 
   fetchPlaceDetails(token, placeId);
+  fetchReviewsForPlace(placeId);
 }
 
 /**
@@ -315,3 +316,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+
+async function fetchReviewsForPlace(placeId) {
+  const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`);
+  if (!response.ok) {
+    console.error("Failed to fetch reviews.");
+    return;
+  }
+
+  const reviews = await response.json();
+  const reviewsContainer = document.getElementById("reviews");
+
+  //  Clean actual contents
+  reviewsContainer.innerHTML = "<h2>Reviews</h2>";
+
+  if (reviews.length === 0) {
+    const emptyMsg = document.createElement("p");
+    emptyMsg.textContent = "No reviews yet.";
+    reviewsContainer.appendChild(emptyMsg);
+    return;
+  }
+
+  reviews.forEach(async (review) => {
+    const reviewCard = document.createElement("article");
+    reviewCard.classList.add("review-card");
+
+    // create a default value if user dont exist anymore
+    let reviewerName = "Anonymous user";
+
+    // Fetch user name through userID
+    if (review.user_id) {
+      const userData = await fetch(`http://127.0.0.1:5000/api/v1/users/${review.user_id}`);
+      if (userData.ok) {
+        const user = await userData.json();
+        reviewerName = `${user.first_name} ${user.last_name}`;
+        console.log("Reviewer name found !")
+      }
+    }
+
+    reviewCard.innerHTML = `
+      <h3>${reviewerName}</h3>
+      <p>Review: ${review.text}</p>
+      <p>Rating: ${review.rating} stars</p>
+    `;
+
+    reviewsContainer.appendChild(reviewCard);
+  });
+}
