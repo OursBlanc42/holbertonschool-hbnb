@@ -204,17 +204,12 @@ if (priceFilter) {
 
 /**
  * Get place id from URL
- * Catch and return he ID of the place from url ie: place.html?id=f9ab90f
  */
 function getPlaceIdFromURL() {
   const placeId = new URLSearchParams(window.location.search);
   return placeId.get("id");
 }
 
-/**
- * Check if the user is authentified
- * If not, hide the add review section
- */
 function checkAuthentication() {
   const token = getCookie("token");
   const placeId = getPlaceIdFromURL();
@@ -269,49 +264,3 @@ async function fetchPlaceDetails(token, placeId) {
     alert("Fetch place details failed: " + response.statusText);
   }
 }
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  const reviewForm = document.getElementById('review-form');
-  const token = getCookie("token");
-  const placeId = getPlaceIdFromURL();
-  let userId = null;
-
-  // if a token exist, try to decode JWT and found the user ID
-  if (token) {
-    const base64 = token.split('.')[1];
-    const json = atob(base64);
-    const decodedToken = JSON.parse(json);
-    userId = decodedToken.sub.id;
-    console.log("User ID:", userId);
-  }
-
-  // send review
-  reviewForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-
-    const reviewText = document.getElementById('review-text').value;
-
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        text: reviewText,
-        rating: 5, // temporary, not implemented yet in the form
-        user_id: userId,
-        place_id: placeId
-      })
-    });
-    if (response.ok) {
-      alert("Review submitted!");
-      reviewForm.reset();
-      location.reload();
-    } else {
-      alert("Failed to submit review!");
-    }
-  });
-});
