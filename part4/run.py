@@ -7,7 +7,7 @@ facade = HBnBFacade()
 def create_admin_user():
     admin_data = {
         "first_name": "Admin",
-        "last_name": "User",
+        "last_name": "airbnbear",
         "email": "admin@example.com",
         "password": "admin123",
         "is_admin": True

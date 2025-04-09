@@ -27,6 +27,10 @@
             <label for="price-filter">Max Price:</label>
             <select id="price-filter">
                 <!-- Options will be populated dynamically -->
+              <option value="">-- Select max price --</option>
+              <option value="50">50 €</option>
+              <option value="100">100 €</option>
+              <option value="150">150 €</option>
             </select>
         </section>
         <section id="places-list">
@@ -36,7 +40,7 @@
                 <li>
                     <article class="place-card">
                         <h3>Name of place 1</h3>
-                        <p>Price per night : xxx €</p>
+                        <p>Price per night: <span class="price">100</span> €</p>
                         <div class="details-button">
                             <p>View Details</p>
                         </div>
@@ -45,7 +49,7 @@
                 <li>
                     <article class="place-card">
                         <h3>Name of place 2</h3>
-                        <p>Price per night : xxx €</p>
+                        <p>Price per night: <span class="price">200</span> €</p>
                         <div class="details-button">
                             <p>View Details</p>
                         </div>
@@ -54,7 +58,7 @@
                 <li>
                     <article class="place-card">
                         <h3>Name of place 3</h3>
-                        <p>Price per night : xxx €</p>
+                        <p>Price per night: <span class="price">300</span> €</p>
                         <div class="details-button">
                             <p>View Details</p>
                         </div>
@@ -64,7 +68,7 @@
         </section>
     </main>
     <footer>
-        <p>© 2025 Hbnb Evolution, all rights reserved. Made with ♥ by OursBlanc (student at Holberton School)</p>
+        <p>© 2025 Hbnb Evolution, all rights reserved. Handmade with ♥ by OursBlanc (student at Holberton School)</p>
     </footer>
     <script src="scripts.js"></script>
 </body>

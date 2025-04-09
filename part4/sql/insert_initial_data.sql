@@ -4,9 +4,9 @@ INSERT INTO users (id, first_name, last_name, email, password, is_admin)
 VALUES (
     '36c9050e-ddd3-4c3b-9731-9f487208bbc1',
     'Admin',
-    'HBnB',
-    'admin@hbnb.io',
-    '$2b$12$eImiTXuWVxfM37uY4JANjQe5xv3s5l9pXbZ9zQ4u8E4y3zF9Xz5y.', -- bcrypt hash of 'admin1234'
+    'airbnbear',
+    'admin@example.com',
+    '$2b$12$FKHyF05SBD9P.loYwka92ODRrbLvMcJhUnumfM7WOL.aM3tj89NCG', -- bcrypt hash of 'admin123'
     TRUE
 );
 

@@ -1,8 +1,7 @@
-/* 
-  This is a SAMPLE FILE to get you started.
-  Please, follow the project instructions to complete the tasks.
-*/
-
+/**
+ * Listen for form submit and send login data to backend
+ * Triggered when login button is clicked
+ */
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
 
@@ -17,10 +16,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+
+/**
+ * Sends login credential to the backend and handle the response
+ * If successful : stores the token in a cookie and redirect to home page
+ *
+ * @param {string} email - User's email address
+ * @param {string} password - User's password
+ */
 async function loginUser(email, password) {
-  const response = await fetch("http://127.0.0.1:5000/api/v1/auth/login/", {
+  const response = await fetch("http://127.0.0.1:5000/api/v1/auth/login", {
     method: "POST",
-    credentials: 'include',
     headers: {
       "Content-Type": "application/json",
     },
@@ -36,11 +42,20 @@ async function loginUser(email, password) {
   }
 }
 
+
+/**
+ * Run the following function on each page load / reload
+ */
 window.onload = function () {
   loginVisibility();
-  fetchPlaces();
+  const token = getCookie("token");
+  fetchPlaces(token);
 };
 
+/**
+ * Hide/show login button depending if the user is logged or not
+ * By checking if the cookie with JWT token is present
+ */
 function loginVisibility() {
   let token = checkCookie("token");
   console.log("Check Cookie...");
@@ -53,6 +68,11 @@ function loginVisibility() {
   }
 }
 
+/**
+ * Check if specific cookie is present and return true or false
+ *
+ * @param {string} name - Cookie's name
+ */
 function checkCookie(name) {
   const regex = new RegExp(`(^| )${name}=([^;]+)`);
   const match = document.cookie.match(regex);
@@ -63,20 +83,104 @@ function checkCookie(name) {
   }
 }
 
-async function fetchPlaces() {
-    const response = await fetch("http://127.0.0.1:5000/api/v1/places/", {
-      method: "GET",
-      credentials: 'include',
-      headers: {
-        "Content-Type": "application/json",
-        credentials: "include",
-      },
+/**
+ * Get value of a specific cookie and return this alue
+ *
+ * @param {string} name - Cookie's name
+ */
+function getCookie(name) {
+  const regex = new RegExp(`(^| )${name}=([^;]+)`);
+  const match = document.cookie.match(regex);
+  if (match) {
+    return match[2];
+  } else {
+    return null;
+  }
+}
+
+
+/**
+ * Fetches places from the backend and displays them on the page
+ * Also extracts all prices and stores them for use in the max price filter
+ */
+async function fetchPlaces(token) {
+
+  // Send GET request to API
+  const response = await fetch("http://127.0.0.1:5000/api/v1/places/", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    const placesList = document.querySelector("#places-list ul");
+
+    // Empty existing list (if any)
+    placesList.innerHTML = "";
+
+    // Create an empty set to store price of each place (unique)
+    let priceSet = new Set();
+
+    data.forEach(place => {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+    <article class="place-card">
+        <h3>${place.title}</h3>
+        <p>Price per night: <span class="price">${place.price}</span> €</p>
+        <div class="details-button">
+            <p>View Details</p>
+        </div>
+    </article>
+  `;
+
+      placesList.appendChild(li);
+      priceSet.add(place.price);
     });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-    } else {
-      alert("Fetch places failed: " + response.statusText);
-    }
+    // Filter price
+    const sortedPrices = [...priceSet].sort((a, b) => a - b);
+    console.log("Prices are found :) and here is the list sorted:", sortedPrices);
+
+    // Populate price list
+    const select = document.getElementById("price-filter");
+
+    // Clean list (if any) and write default value
+    select.innerHTML = '<option value="">All</option>';
+
+    sortedPrices.forEach(price => {
+      const option = document.createElement("option");
+      option.value = price;
+      option.textContent = price + " €";
+      select.appendChild(option);
+    });
+
+
+  } else {
+    alert("Fetch places failed: " + response.statusText);
   }
+}
+
+/**
+ * Listens selection in the price filter selector
+ * Filters place cards by price without reloading the page
+ */
+document.getElementById("price-filter").addEventListener("change", () => {
+  const selectedPrice = parseFloat(document.getElementById("price-filter").value);
+  const placeCards = document.querySelectorAll(".place-card");
+
+  placeCards.forEach(card => {
+    const price = parseFloat(card.querySelector(".price").textContent);
+    if (price <= selectedPrice || isNaN(selectedPrice)) {
+      card.style.display = "";
+    } else {
+      card.style.display = "none";
+    }
+  });
+});
+
+
+

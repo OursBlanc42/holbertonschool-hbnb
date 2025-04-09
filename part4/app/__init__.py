@@ -41,6 +41,6 @@ def create_app(config_class="config.DevelopmentConfig"):
     db.init_app(app)
 
     # initialize cors
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": "*"}}, allow_headers=["Content-Type", "Authorization"])
 
     return app
