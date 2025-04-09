@@ -69,6 +69,7 @@ async function fetchPlaces() {
       credentials: 'include',
       headers: {
         "Content-Type": "application/json",
+        credentials: "include",
       },
     });
 

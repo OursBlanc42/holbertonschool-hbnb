@@ -16,7 +16,7 @@ jwt = JWTManager()
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
-    CORS(app, origins=["http://localhost:3000", "http://localhost:3000"])
+
     app.config.from_object(config_class)
 
     api = Api(app, version='1.0', title='HBnB API',
@@ -39,5 +39,8 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     # initialize db
     db.init_app(app)
+
+    # initialize cors
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     return app
