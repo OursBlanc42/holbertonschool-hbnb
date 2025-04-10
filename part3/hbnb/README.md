@@ -1,19 +1,15 @@
-# HBNB Part 2 - BL and API
+# HBNB Part 3 : Auth & API
 
 ## Version 1.0.0
-Release Date: 2 march 2025
-
-This is the `1.0.0` version of the project ! First release !
 
 ## Disclaimer
 For more information about this project, please refer to Part 1 README.md and Part 2 README.md !
 [Link to part1 README](../../part1/README.md)
-[Link to part1 README](../../part2/README.md)
-
+[Link to part2 README](../../part2/README.md)
 
 
 ## Intro
-After created the projecture structure in part 1, and implement business logic and creating endpoint for the RESTfulAPI, the aim of this part 3 is to enhance backend with authentication and database integration
+After created the project structure in part 1, and implement business logic and creating endpoint for the RESTfulAPI in part 2, the aim of this part 3 is to enhance backend with authentication and database integration
 
 ### Explanation
 **Authentication and Authorization:**
