@@ -1,7 +1,4 @@
-/* 
-  This is a SAMPLE File to get you started. Follow the instructions on the project to complete the tasks. 
-  You'll probably need to override some of theese styles.
-*/
+
 
 * {
     box-sizing: border-box;
@@ -21,17 +18,38 @@ header {
     padding: 1rem;
 }
 
+nav {
+    padding-top: 12px;
+    border-top: 1px solid #ff7c7c;
+}
+
 nav a {
-    color: #333;
     text-decoration: none;
     margin-left: 1rem;
+    border-radius: 2px;
+    padding: 5px;
 }
 
 main {
     padding: 2rem;
 }
 
+#filter, #place-details, #reviews {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
 
+.place-info {
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.place-info .label {
+    font-weight: bold;
+}
 
 /* Cards about places */
 .place-card {
@@ -53,4 +71,79 @@ main {
 .logo {
     height: 70px;
     width: auto;
+    margin-bottom:10px;
+}
+
+/* Define style about Login Form */
+form {
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    max-width: 400px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+form input {
+    padding: 10px;
+    margin: 10px;
+}
+
+form h2 {
+    text-align: center;
+}
+
+button {
+    width: 100px;
+    margin: 15px auto;
+    padding: 10px;
+    background: #FF4742; 
+    border: none;
+    border-radius: 10px;
+    color: #FFFFFF; 
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    transition: transform 0.5s;
+}
+
+button:hover {
+    background: #FF6A65;
+    transform: scale(1.1);
+}
+
+/* remove tick in list */
+ul {
+    list-style-type: none;
+}
+
+/* link management without effect on image */
+a {
+    box-shadow: inset 0 0 0 0 #ff7c7c;
+    text-decoration: none;
+    color: #ff5555;
+    margin: 0 -0.25rem;
+    padding: 0 0.25rem;
+    transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
+  }
+
+  a:not(:has(img)):hover {
+    color: #ddd;
+    box-shadow: inset 100px 0 0 0 #ff5555;
+  }
+
+
+/* footer management with a fix footer hover the page */
+
+footer {
+    background-color: #E0E0E0;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
