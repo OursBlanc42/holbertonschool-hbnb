@@ -7,8 +7,37 @@ For more information about this project, please refer to these README :
 [Link to main README](../../README.md)
 [Link to part1 README](../../part1/README.md)
 [Link to part2 README](../../part2/README.md)
-[Link to part3 README](../../part2/README.md)
+[Link to part3 README](../../part3/README.md)
 
+---
+
+## Table of Contents
+
+- [Intro](#intro)
+- [Explanation](#explanation)
+  - [HTML](#html)
+  - [CSS](#css)
+  - [Security, Scalability & Improvements](#security-scalability--improvements)
+  - [JS (Frontend)](#js-frontend)
+    - [`window.onload`](#windowonload)
+    - [`loginUser(email, password)`](#loginuseremail-password)
+    - [`loginVisibility()`](#loginvisibility)
+    - [`checkAuthentication()`](#checkauthentication)
+    - [`checkCookie(name)`](#checkcookiename)
+    - [`getCookie(name)`](#getcookiename)
+    - [`fetchPlaces(token)`](#fetchplacestoken)
+    - [`priceFilter()`](#pricefilter)
+    - [`getPlaceIdFromURL()`](#getplaceidfromurl)
+    - [`fetchPlaceDetails(token, placeId)`](#fetchplacedetailstoken-placeid)
+    - [Review form submit](#review-form-submit)
+    - [`fetchReviewsForPlace(placeId)`](#fetchreviewsforplaceplaceid)
+- [Getting started](#getting-started)
+  - [Prerequisite](#prerequisite)
+  - [Installation](#installation)
+- [Testing](#testing)
+- [Script](#script)
+- [Demo Data](#demo-data)
+  - [Users](#users)
 
 ---
 
