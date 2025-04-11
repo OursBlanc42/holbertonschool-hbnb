@@ -116,10 +116,6 @@ button:hover {
     transform: scale(1.1);
 }
 
-/* remove tick in list */
-ul {
-    list-style-type: none;
-}
 
 /* link management without effect on image */
 a {
@@ -147,3 +143,14 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+/* generate grid for places */
+#places-list ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
