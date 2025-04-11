@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/OursBlanc42/holbertonschool-hbnb/blob/main/part4/images/logo.png?raw=true" alt="Airbnbear logo" width="250"/>
+</p>
+
 # HBNB Part 4 : Auth & API
 
 ## Version 1.0.0
