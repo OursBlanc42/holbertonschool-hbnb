@@ -44,7 +44,6 @@ async function loginUser(email, password) {
 /**
  * Run the following function on certains pages load/reload
  */
-
 window.onload = () => {
   // Check login visibility on all pages
   loginVisibility();
@@ -84,7 +83,6 @@ function loginVisibility() {
   }
 }
 
-
 /**
  * Check if specific cookie is present and return true or false
  *
@@ -101,7 +99,7 @@ function checkCookie(name) {
 }
 
 /**
- * Get value of a specific cookie and return this alue
+ * Get value of a specific cookie and return this value
  *
  * @param {string} name - Cookie's name
  */
@@ -204,7 +202,7 @@ if (priceFilter) {
 
 /**
  * Get place id from URL
- * Catch and return he ID of the place from url ie: place.html?id=f9ab90f
+ * Catch and return the ID of the place from url ie: place.html?id=f9ab90f
  */
 function getPlaceIdFromURL() {
   const placeId = new URLSearchParams(window.location.search);
@@ -212,7 +210,7 @@ function getPlaceIdFromURL() {
 }
 
 /**
- * Check if the user is authentified
+ * Check if the user is authenticated
  * If not, hide the add review section
  */
 function checkAuthentication() {
@@ -231,7 +229,7 @@ function checkAuthentication() {
 }
 
 /**
- * Fetches places details from the backend and displays them on the page
+ * Fetches place details from the backend and displays them on the page
  */
 async function fetchPlaceDetails(token, placeId) {
   // Send GET request to API
@@ -271,8 +269,10 @@ async function fetchPlaceDetails(token, placeId) {
   }
 }
 
-
-
+/**
+ * Listen for form submit and send review data to backend
+ * Triggered when review form is submitted
+ */
 document.addEventListener('DOMContentLoaded', () => {
   const reviewForm = document.getElementById('review-form');
   const token = getCookie("token");
@@ -317,7 +317,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
+/**
+ * Fetches reviews for a specific place from the backend and displays them on the page
+ */
 async function fetchReviewsForPlace(placeId) {
   const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`);
   if (!response.ok) {

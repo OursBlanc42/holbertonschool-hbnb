@@ -10,6 +10,9 @@ For more information about this project, please refer to these README :
 [Link to part3 README](../../part2/README.md)
 
 
+---
+
+
 ## Intro  
 After setting up the project structure in Part 1, implementing the business logic and RESTful API endpoints in Part 2, and enhancing the backend with authentication and database integration in Part 3, we now arrive at the final stage — Part 4.
 
@@ -17,6 +20,7 @@ Unlike the previous parts, this section was completed individually, giving us mo
 
 For this reason, I decided to rebrand the project from **HBnB** to **Airbnbear**, giving it a fresh and personal touch.
 
+---
 
 ### Explanation
 
@@ -40,12 +44,109 @@ This project is a demo intended to showcase my skills. However, I’m aware that
 - Some features are missing (e.g., adding a rating in reviews, showing amenities, allowing users to create places).
 - Flask is running with the built-in development server, which isn’t suitable for production.
 - No real automated testing has been implemented — only manual/visual tests.
+- Divide the script.js file in several file and more DRY
 - And probably a few other things I forgot...
 
 This project is a solid foundation but not production-ready — and that’s okay. It’s all part of the learning process.
 
-#### JS
+#### JS (Frontend)
 
+This file manages the frontend interactions for the Airbnbear project.  
+It handles login, place listing, place details, user authentication, review submission, and filtering.
+
+
+
+##### `window.onload`
+Triggered on each page load/reload:
+- On all pages: calls `loginVisibility()` to show or hide the login button depending on the presence of a token (i.e. user is logged in or not)
+- On `index.html`: calls `fetchPlaces()` to display all available places
+- On `place.html`: calls `checkAuthentication()` to show or hide the review section based on the user's login status. It also fetches place details in any case
+
+
+
+##### `loginUser(email, password)`
+- Triggered by an event listener on the login form
+- Sends login credentials to the backend API
+- On success: stores the token in a cookie and redirects to the homepage
+- On failure: displays `Login failed` with the response status
+
+
+
+##### `loginVisibility()`
+- Shows or hides the login link depending on whether the user is logged in (based on token presence)
+
+
+
+##### `checkAuthentication()`
+- Hides the review section if the user is not authenticated
+- Fetches and displays place details and associated reviews
+
+
+
+##### `checkCookie(name)`
+- Returns `true` if a specific cookie is present, otherwise `false`
+
+
+##### `getCookie(name)`
+- Returns the value of a specified cookie, or `null` if not found
+
+
+
+##### `fetchPlaces(token)`
+- Sends a `GET` request to fetch all places from the backend
+- On success:
+  - Creates a DOM block for each place
+  - Collects and deduplicates prices
+  - Sorts prices and populates the price filter
+- On failure: shows `Fetch places failed` with the status message
+
+
+
+##### `priceFilter()`
+- Event listener triggered when the user selects a specific price
+- Hides places that exceed the selected price
+
+
+
+##### `getPlaceIdFromURL()`
+- Retrieves the `id` parameter from the URL (e.g. `place.html?id=f9ab90f`)
+
+
+
+##### `checkAuthentication()`
+- Extracts the token from cookies
+- Retrieves the place ID from the URL
+- Displays or hides the review form depending on the token
+- Calls `fetchPlaceDetails()` and `fetchReviewsForPlace()`
+
+
+
+##### `fetchPlaceDetails(token, placeId)`
+- Sends a `GET` request to fetch details about a specific place
+- On success: updates the DOM with title, price, description, etc.
+- On failure: displays an error
+
+
+
+##### Review form submit
+- Event listener on the review form submission
+- If a token exists: decodes the JWT to extract the user ID
+- Sends the review to the API via `POST`
+  - Currently, the rating is always `5 stars` (rating selector not implemented yet)
+- On success: shows `Review submitted!`
+- On failure: shows `Failed to submit review!`
+
+
+
+##### `fetchReviewsForPlace(placeId)`
+- Fetches all reviews linked to a given place
+- If no reviews are found: shows `No reviews yet.`
+- If a user doesn't exist anymore: displays `Anonymous user`
+- Fetches the reviewer's name from the API using `user_id`
+- Updates the DOM with reviewer name, review text, and rating (default: 5 stars)
+
+
+---
 
 ## Getting started
 **Disclaimer : These explanations was tested on my Linux machine. So it's valid on a Linux system only.**
@@ -96,22 +197,32 @@ Admin user already exists. Check the README for default credentials.
 
 9. Optionnal : You can also try the API with cURL, Postman, Swagger web UI, or whatever... You can find more information about this in part 3 of the project.
 
+---
 
-### Testing 
-For this part of the project, la plupart des tests ont été visuel dans le sens ou je naviguais sur le site web avec différents cas d'usage.
-J'ai également fait quelques tests with a Postman collection. You can find the Postman file in the `hbnb/tests` directory.
+### Testing  
+For this part of the project, most of the testing was done visually by navigating the website and trying various usage scenarios.  
+I also performed some tests using a Postman collection, which you can find in the `hbnb/tests` directory.
 
-Il est à noté que certains de ces tests échouent (surtout pour les cas particuliers et certains scénarios exotiques), certainement des erreurs à corriger entre le back et la DB.
+**Note:** Some of these tests fail (especially edge cases or unusual scenarios), likely due to inconsistencies between the backend and the database that still need to be fixed.
 
-### Script
-Afin de faciliter l'installation j'ai créé un script en bash qui effectue les opérations suivantes :
-- Créer la database
-- Créer les tables dans la database
-- Populer les tables de la database avec des données pour la démo
-- Lancer le serveur back-end
+---
 
-### Données de démo
-Le fichier SQL qui popule la db avec des données pour la démo crée trois utilisateurs, des places, des reviews, et des commodités (qui ne sont pas encore implémenté actuellement coté front-end)
+### Script  
+To simplify setup, I created a Bash script that performs the following steps:
+- Creates the database
+- Creates all required tables
+- Populates the database with demo data
+- Starts the backend server
+
+---
+
+### Demo Data  
+The SQL file used to populate the demo database creates:
+- Three users
+- Several places
+- Reviews
+- Some amenities (**note:** amenities are not yet implemented on the frontend)
+
 
 #### Users
 As mentioned earlier, three users have been created for testing purposes.
