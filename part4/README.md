@@ -4,10 +4,10 @@
 
 ## Disclaimer
 For more information about this project, please refer to these README :
-[Link to main README](../../README.md)
-[Link to part1 README](../../part1/README.md)
-[Link to part2 README](../../part2/README.md)
-[Link to part3 README](../../part3/README.md)
+- [Main README](https://github.com/OursBlanc42/holbertonschool-hbnb/blob/main/README.md)
+- [Part 1 README](https://github.com/OursBlanc42/holbertonschool-hbnb/tree/main/part1/README.md)
+- [Part 2 README](https://github.com/OursBlanc42/holbertonschool-hbnb/tree/main/part2/hbnb/README.md)
+- [Part 3 README](https://github.com/OursBlanc42/holbertonschool-hbnb/tree/main/part3/README.md)
 
 ---
 
